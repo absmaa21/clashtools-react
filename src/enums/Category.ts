@@ -1,4 +1,4 @@
-enum Category {
+export enum Category {
   TROOP,
   HERO,
   TRAP,

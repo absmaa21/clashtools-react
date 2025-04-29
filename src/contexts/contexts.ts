@@ -15,3 +15,14 @@ export interface EntityStatsContextProps {
 }
 
 export const EntityStatsContext = createContext<EntityStatsContextProps | undefined>(undefined)
+
+
+export interface ClientContextProps {
+  authToken: string,
+  refreshToken: string,
+  login: (username: string, password: string) => void,
+  register: (username: string, email: string, password: string) => void,
+  logout: () => void,
+}
+
+export const ClientContext = createContext<ClientContextProps | undefined>(undefined)

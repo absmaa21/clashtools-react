@@ -1,5 +1,6 @@
 import {ReactNode, useState} from "react";
 import {EntitiesContext} from "./contexts.ts";
+import {demoEntities} from "../services/demoData.ts";
 
 interface EntitiesProviderProps {
   children: ReactNode,
@@ -7,7 +8,7 @@ interface EntitiesProviderProps {
 
 function EntitiesProvider({children}: EntitiesProviderProps) {
 
-  const [entities, setEntities] = useState<Entity[]>([])
+  const [entities, setEntities] = useState<Entity[]>(demoEntities)
 
   function addEntity(newBuilding: Entity): ServiceResponse {
     setEntities(p => [...p, newBuilding])
