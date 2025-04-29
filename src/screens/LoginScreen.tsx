@@ -2,8 +2,11 @@ import {TextField, Button, Box, Typography} from '@mui/material';
 import React, {useState} from "react";
 import useClient from "../hooks/useClient.ts";
 
+interface Props {
+  onSuccess?: () => void,
+}
 
-const LoginScreen = () => {
+const LoginScreen = ({onSuccess}: Props) => {
   const Client = useClient()
 
   const [error, setError] = useState<string | null>(null)
@@ -13,7 +16,7 @@ const LoginScreen = () => {
     const formData = new FormData(e.currentTarget)
     // TODO error handling
 
-    Client.login(formData.get('email') as string, formData.get('password') as string)
+    if (Client.login(formData.get('email') as string, formData.get('password') as string) && onSuccess) onSuccess()
     setError('Invalid data')
   }
 

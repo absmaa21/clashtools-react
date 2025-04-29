@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import {Category} from "../enums/Category.ts";
 import LevelCol from "../components/upgrade-tracker/LevelCol.tsx";
+import UpgradeCol from "../components/upgrade-tracker/UpgradeCol.tsx";
 
 const entities: Entity[] = [
   {
@@ -23,12 +24,16 @@ const entities: Entity[] = [
         id: 'asdasd1',
         level: 1,
         stats: [],
+        resource: ResourceType.GOLD,
+        cost: 4500000,
       },
       {
         id: 'asdasd2',
         level: 2,
         timeUntilCompleted: 5643543,
         stats: [],
+        resource: ResourceType.GOLD,
+        cost: 8000000,
       },
     ],
   }
@@ -38,22 +43,17 @@ const entities: Entity[] = [
 const UpgradeTracker = () => {
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" style={{padding: 0, paddingTop: 32, paddingBottom: 32}}>
       <TableContainer component={Paper}>
         <Table>
-          <TableHead sx={{bgcolor: '#1565c0'}}>
-            <TableRow>
-              <TableCell sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Defense</TableCell>
-              <TableCell colSpan={3} sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Level</TableCell>
-              <TableCell colSpan={0} sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Upgrades</TableCell>
-            </TableRow>
-          </TableHead>
+          <UpgradeTableHeader/>
+
           <TableBody>
             {entities.map(entity => entity.levels.map((entityLevel, i) => entityLevel.level < entity.maxLevel && (
               <TableRow key={entityLevel.id}>
                 {i == 0 && <TableCell
                     rowSpan={entity.levels.length}
-                    sx={{borderRight: "solid 1px #0002"}}
+                    sx={{ borderRight: "solid 1px #0002", width: {xs: '25%', md: '20%'} }}
                 >
                     <Box sx={{
                       justifyContent: 'center',
@@ -68,9 +68,7 @@ const UpgradeTracker = () => {
                     </Box>
                 </TableCell>}
                 <LevelCol entity={entity} entityLevel={entityLevel}/>
-                <TableCell width={300}>
-                  Lvl 11
-                </TableCell>
+                <UpgradeCol entityLevel={entityLevel}/>
               </TableRow>
             )))}
           </TableBody>
@@ -79,6 +77,19 @@ const UpgradeTracker = () => {
     </Container>
   );
 };
+
+
+const UpgradeTableHeader = () => {
+  return (
+    <TableHead sx={{bgcolor: '#1565c0'}}>
+      <TableRow>
+        <TableCell sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Defense</TableCell>
+        <TableCell colSpan={3} sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Level</TableCell>
+        <TableCell colSpan={0} sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Upgrades</TableCell>
+      </TableRow>
+    </TableHead>
+  )
+}
 
 /*
 {upgrades.map((upgrade) => (

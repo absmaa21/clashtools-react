@@ -2,7 +2,11 @@ import {TextField, Button, Box, Typography} from '@mui/material';
 import React, {useEffect, useState} from "react";
 import useClient from "../hooks/useClient.ts";
 
-const RegisterScreen = () => {
+interface Props {
+  onSuccess?: () => void,
+}
+
+const RegisterScreen = ({onSuccess}: Props) => {
   const Client = useClient()
 
   const [errors, setErrors] = useState({username: '', email: '', password: '', conPassword: ''})
@@ -26,7 +30,7 @@ const RegisterScreen = () => {
       return
     }
 
-    Client.register(username, email, password)
+    if (Client.register(username, email, password) && onSuccess) onSuccess()
   };
 
   useEffect(() => {

@@ -10,8 +10,8 @@ interface ClientProviderProps {
 
 function ClientProvider({children}: ClientProviderProps) {
 
-  const [authToken, setAuthToken] = useState<string>('')
-  const [refreshToken, setRefreshToken] = useState<string>('')
+  const [authToken, setAuthToken] = useState<string>('dfgh')
+  const [refreshToken, setRefreshToken] = useState<string>('nbmvcfxghz')
   useEffect(() => {
     if (!authToken || !refreshToken) {
       console.log("Tokens invalid!")
@@ -31,6 +31,7 @@ function ClientProvider({children}: ClientProviderProps) {
       Storage.save("refresh_token", password)
        */
     })
+    return true
   }
 
 
@@ -38,6 +39,7 @@ function ClientProvider({children}: ClientProviderProps) {
     axios.post(`${base_url}/api/auth/register`, {username, email, password}).then(r => {
       console.log(`REGISTER: ${r.data}`)
     })
+    return true
   }
 
 
@@ -49,8 +51,13 @@ function ClientProvider({children}: ClientProviderProps) {
   }
 
 
+  function isLoggedIn(): boolean {
+    return !!authToken && !!refreshToken
+  }
+
+
   return (
-    <ClientContext.Provider value={{authToken, refreshToken, login, register, logout}}>
+    <ClientContext.Provider value={{authToken, refreshToken, login, register, logout, isLoggedIn}}>
       {children}
     </ClientContext.Provider>
   );
