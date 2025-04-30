@@ -23,18 +23,22 @@ const entities: Entity[] = [
     levels: [
       {
         id: 'asdasd1',
-        level: 1,
+        level: 5,
         stats: [],
         resource: ResourceType.GOLD,
-        cost: 4500000,
+        cost: 20000,
+        upgradeTime: 6 * 60 * 60,
+        imgPath: '',
       },
       {
         id: 'asdasd2',
-        level: 2,
+        level: 21,
         timeUntilCompleted: 5643543,
         stats: [],
         resource: ResourceType.GOLD,
         cost: 8000000,
+        upgradeTime: (5 * 24 + 12) * 60 * 60,
+        imgPath: '',
       },
     ],
   }

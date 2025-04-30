@@ -8,4 +8,6 @@ interface EntityLevel {
   stats: EntityStat[],
   cost: number,
   resource: ResourceType,
+  upgradeTime: number,
+  imgPath: string,
 }
