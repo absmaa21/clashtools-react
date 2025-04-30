@@ -10,11 +10,14 @@ interface ClientProviderProps {
 
 function ClientProvider({children}: ClientProviderProps) {
 
+  const [user, setUser] = useState<User | null>(null)
   const [authToken, setAuthToken] = useState<string>('dfgh')
   const [refreshToken, setRefreshToken] = useState<string>('nbmvcfxghz')
   useEffect(() => {
     if (!authToken || !refreshToken) {
       console.log("Tokens invalid!")
+      const loaded_user = Storage.load("user")
+      if (loaded_user) setUser(JSON.parse(loaded_user))
       setAuthToken(Storage.load("auth_token") ?? '')
       setRefreshToken(Storage.load("refresh_token") ?? '')
     }
@@ -57,7 +60,7 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   return (
-    <ClientContext.Provider value={{authToken, refreshToken, login, register, logout, isLoggedIn}}>
+    <ClientContext.Provider value={{user, authToken, refreshToken, login, register, logout, isLoggedIn}}>
       {children}
     </ClientContext.Provider>
   );

@@ -16,6 +16,7 @@ export const EntityStatsContext = createContext<EntityStatsContextProps | undefi
 
 
 export interface ClientContextProps {
+  user: User | null,
   authToken: string,
   refreshToken: string,
   login: (username: string, password: string) => boolean,

@@ -1,4 +1,4 @@
-enum ResourceType {
+export enum ResourceType {
   GOLD,
   ELIXIR,
   DARK_ELIXIR,

@@ -12,6 +12,7 @@ import {
 import {Category} from "../enums/Category.ts";
 import LevelCol from "../components/upgrade-tracker/LevelCol.tsx";
 import UpgradeCol from "../components/upgrade-tracker/UpgradeCol.tsx";
+import {ResourceType} from "../enums/ResourceType.ts";
 
 const entities: Entity[] = [
   {
@@ -62,7 +63,7 @@ const UpgradeTracker = () => {
                       flexDirection: 'column',
                       gap: 1
                     }}>
-                        <img src={'https://www.clash.ninja/images/entities/127_7.png'} alt={entity.name + " image"}
+                        <img src={'https://static.wikia.nocookie.net/clashofclans/images/f/fa/Archer_Tower21.png'} alt={entity.name + " image"}
                              width={40}/>
                         <Typography variant={'body2'}>{entity.name}</Typography>
                     </Box>
