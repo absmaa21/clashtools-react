@@ -14,10 +14,14 @@ const LoginScreen = ({onSuccess}: Props) => {
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget)
-    // TODO error handling
 
-    if (Client.login(formData.get('email') as string, formData.get('password') as string) && onSuccess) onSuccess()
-    setError('Invalid data')
+    Client.login(formData.get('username') as string, formData.get('password') as string).then(error => {
+      if (typeof error !== 'string' && error) {
+        setError(error.message)
+        return
+      }
+      if (onSuccess) onSuccess()
+    })
   }
 
   return (
@@ -36,10 +40,10 @@ const LoginScreen = ({onSuccess}: Props) => {
       <form onSubmit={handleLogin} style={{width: '100%'}}>
         <TextField
           fullWidth
-          label="Email"
+          label="Username"
           variant="filled"
           margin="normal"
-          name="email"
+          name="username"
           required
           error={!!error}
         />

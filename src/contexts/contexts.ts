@@ -1,4 +1,5 @@
 import React, {createContext, SetStateAction} from "react";
+import {ErrorResponse} from "../types/ApiResponse.ts";
 
 
 export interface EntitiesContextProps {
@@ -13,11 +14,10 @@ export const EntitiesContext = createContext<EntitiesContextProps | undefined>(u
 
 export interface ClientContextProps {
   user: User | null,
-  authToken: string,
-  refreshToken: string,
-  login: (username: string, password: string) => boolean,
-  register: (username: string, email: string, password: string) => boolean,
-  logout: () => void,
+  tokens: Tokens,
+  login: (username: string, password: string) => Promise<ErrorResponse | string | null>,
+  register: (username: string, email: string, password: string) => Promise<ErrorResponse | string | null>,
+  logout: () => Promise<void>,
   isLoggedIn: () => boolean,
 }
 export const ClientContext = createContext<ClientContextProps | undefined>(undefined)

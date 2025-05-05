@@ -30,7 +30,18 @@ const RegisterScreen = ({onSuccess}: Props) => {
       return
     }
 
-    if (Client.register(username, email, password) && onSuccess) onSuccess()
+    Client.register(username, email, password).then(error => {
+      if (typeof error !== 'string' && error) {
+        setErrors(p => ({
+          ...p,
+          email: error.fieldErrors?.email || p.email,
+          username: error.fieldErrors?.username || p.username,
+          password: error.fieldErrors?.password || p.password
+        }))
+        return
+      }
+      if (onSuccess) onSuccess()
+    })
   };
 
   useEffect(() => {

@@ -3,64 +3,102 @@ import { ClientContext } from "./contexts";
 import {Storage} from "../utils/Storage"
 import {base_url} from "../env.ts";
 import axios from "axios";
+import {useNotifications} from "@toolpad/core";
+import {ErrorResponse} from "../types/ApiResponse.ts";
+import {jwtDecode, JwtPayload} from "jwt-decode";
 
 interface ClientProviderProps {
   children: ReactNode,
 }
 
+const emptyTokens: Tokens = {
+  accessToken: '',
+  refreshToken: '',
+}
+
 function ClientProvider({children}: ClientProviderProps) {
 
+  const notify = useNotifications()
+
   const [user, setUser] = useState<User | null>(null)
-  const [authToken, setAuthToken] = useState<string>('dfgh')
-  const [refreshToken, setRefreshToken] = useState<string>('nbmvcfxghz')
+  const [tokens, setTokens] = useState<Tokens>(emptyTokens)
   useEffect(() => {
-    if (!authToken || !refreshToken) {
-      console.log("Tokens invalid!")
+    if (!isRefreshTokenValid() || !isAccessTokenValid()) {
       const loaded_user = Storage.load("user")
       if (loaded_user) setUser(JSON.parse(loaded_user))
-      setAuthToken(Storage.load("auth_token") ?? '')
-      setRefreshToken(Storage.load("refresh_token") ?? '')
+      const loaded_tokens = Storage.load('user_tokens')
+      if (loaded_tokens) setTokens(JSON.parse(loaded_tokens))
     }
-  }, [authToken, refreshToken]);
+  }, [tokens]);
 
 
-  function login(username: string, password: string) {
-    axios.post(`${base_url}/api/auth/login`, {username, password}).then(r => {
-      console.log(`LOGIN: ${JSON.stringify(r.data)}`)
-      /*
-      setAuthToken(username)
-      setRefreshToken(password)
-      Storage.save("auth_token", username)
-      Storage.save("refresh_token", password)
-       */
-    })
-    return true
+  async function login(username: string, password: string): Promise<ErrorResponse | string | null> {
+    try {
+      const response = await axios.post<Tokens>(`${base_url}/api/auth/login`, {username, password})
+      setTokens(response.data)
+      notify.show('Login successful.', {autoHideDuration: 1000, severity: 'success'})
+      return null
+    } catch (e) {
+      if (axios.isAxiosError<ErrorResponse>(e) && e.response) return e.response.data
+    }
+    return 'Something went wrong'
   }
 
 
-  function register(username: string, email: string, password: string) {
-    axios.post(`${base_url}/api/auth/register`, {username, email, password}).then(r => {
-      console.log(`REGISTER: ${r.data}`)
-    })
-    return true
+  async function register(username: string, email: string, password: string): Promise<ErrorResponse | string | null> {
+    try {
+      const response = await axios.post<string>(`${base_url}/api/auth/register`, {username, email, password})
+      notify.show(response.data, {autoHideDuration: 1000, severity: 'success'})
+      return null
+    } catch (e) {
+      if (axios.isAxiosError<ErrorResponse>(e) && e.response) return e.response.data
+    }
+    notify.show('Something went wrong.', {autoHideDuration: 3000, severity: 'error'})
+    return null
   }
 
 
-  function logout() {
-    Storage.remove("auth_token")
-    Storage.remove("refresh_token")
-    setAuthToken('')
-    setRefreshToken('')
+  async function logout() {
+    Storage.remove("user_tokens")
+    setTokens(emptyTokens)
   }
 
 
   function isLoggedIn(): boolean {
-    return !!authToken && !!refreshToken
+    return isRefreshTokenValid() && isAccessTokenValid()
+  }
+
+
+  function isRefreshTokenValid(): boolean {
+    if (tokens.refreshToken.length === 0) return false
+    try {
+      console.log(tokens.refreshToken)
+      const decodedToken = jwtDecode<JwtPayload>(tokens.refreshToken)
+      console.log(decodedToken)
+    } catch (e) {
+      console.warn('Error while decoding Refresh Token ', e)
+      return false
+    }
+    return true
+  }
+
+
+  function isAccessTokenValid(): boolean {
+    if (tokens.accessToken.length === 0) return false
+    try {
+      console.log(tokens.accessToken)
+      const decodedToken = jwtDecode<JwtPayload>(tokens.accessToken)
+      console.log(decodedToken)
+    } catch (e) {
+      console.warn('Error while decoding Access Token ', e)
+      return false
+    }
+    return true
   }
 
 
   return (
-    <ClientContext.Provider value={{user, authToken, refreshToken, login, register, logout, isLoggedIn}}>
+    <ClientContext.Provider value={{user, tokens, login, register, logout, isLoggedIn}}>
       {children}
     </ClientContext.Provider>
   );
