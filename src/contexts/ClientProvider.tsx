@@ -61,25 +61,29 @@ function ClientProvider({children}: ClientProviderProps) {
   async function logout() {
     Storage.remove("user_tokens")
     setTokens(emptyTokens)
+    await axios.post(`${base_url}/api/auth/logout`)
   }
 
 
   function isLoggedIn(): boolean {
-    return isRefreshTokenValid() && isAccessTokenValid()
+    return isAccessTokenValid()
   }
 
 
-  function isRefreshTokenValid(): boolean {
-    if (tokens.refreshToken.length === 0) return false
+  async function refreshToken(): Promise<ErrorResponse | string | null> {
     try {
-      console.log(tokens.refreshToken)
-      const decodedToken = jwtDecode<JwtPayload>(tokens.refreshToken)
-      console.log(decodedToken)
+      const response = axios.post(`${base_url}/api/auth/refresh`, {refreshToken: tokens.refreshToken})
+      console.log('Token refreshed')
+      console.log(response)
     } catch (e) {
-      console.warn('Error while decoding Refresh Token ', e)
-      return false
+      if (axios.isAxiosError<ErrorResponse>(e) && e.response) {
+        await logout()
+        return e.response.data
+      }
+      console.error('refreshToken error was invalid!', e)
+      return 'Something went wrong'
     }
-    return true
+    return null
   }
 
 
