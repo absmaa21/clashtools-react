@@ -39,12 +39,12 @@ function AdminDashboard() {
                 <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
                   <ListItemButton onClick={() => setEditEntityLevel({
                     id: '',
-                    level: e.levels.length,
-                    stats: e.levels[0].stats,
+                    level: e.levels[e.levels.length-1].level+1,
+                    stats: e.levels[e.levels.length-1].stats,
                     cost: 0,
-                    resource: e.levels[0].resource,
+                    resource: e.levels[e.levels.length-1].resource,
                     upgradeTime: 0,
-                    imgPath: e.levels[0].imgPath,
+                    imgPath: e.levels[e.levels.length-1].imgPath,
                   })}>
                     Add
                   </ListItemButton>

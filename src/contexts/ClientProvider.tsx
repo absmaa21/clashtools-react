@@ -23,7 +23,8 @@ function ClientProvider({children}: ClientProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [tokens, setTokens] = useState<Tokens>(emptyTokens)
   useEffect(() => {
-    if (!isRefreshTokenValid() || !isAccessTokenValid()) {
+    refreshToken()
+    if (!isAccessTokenValid()) {
       const loaded_user = Storage.load("user")
       if (loaded_user) setUser(JSON.parse(loaded_user))
       const loaded_tokens = Storage.load('user_tokens')

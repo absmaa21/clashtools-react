@@ -22,7 +22,7 @@ interface Props {
 
 function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
 
-  const isNew: boolean = initEntityLevel.id.length <= 0
+  const isNew: boolean = initEntityLevel.id.length === 0
   const Entities = useEntities()
   const [entityLevel, setEntityLevel] = useState<EntityLevel>(initEntityLevel ?? {
     id: '',
