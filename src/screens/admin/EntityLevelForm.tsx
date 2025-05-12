@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import useEntities from "../../hooks/useEntities.ts";
+import ConfirmationDialog from "../../components/ConfirmationDialog.tsx";
 
 interface Props {
   entity: Entity,
@@ -33,6 +34,7 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
     upgradeTime: 0,
     imgPath: '',
   })
+  const [deleteRequested, setDeleteRequested] = useState<boolean>(false)
 
   const handleChange = (field: keyof EntityLevel, value: string | number) => {
     setEntityLevel(prev => ({ ...prev, [field]: value }));
@@ -64,9 +66,19 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
   return (
     <Container maxWidth={'md'}>
       <Paper elevation={3} sx={{ p: 3 }}>
-        <Typography variant="h6" sx={{textAlign: 'center', mb: 3}}>
-          {isNew ? `New Level ` : `Edit Level ${initEntityLevel.level} `} for {entity.name}
-        </Typography>
+       <Grid container>
+         <Grid size={1}/>
+         <Grid size={10}>
+           <Typography variant="h6" sx={{textAlign: 'center', mb: 3}}>
+             {isNew ? `New Level ` : `Edit Level ${initEntityLevel.level} `} for {entity.name}
+           </Typography>
+         </Grid>
+         <Grid size={1}>
+           <IconButton onClick={() => setDeleteRequested(true)} color="error">
+             <Delete />
+           </IconButton>
+         </Grid>
+       </Grid>
 
         <Grid container spacing={3}>
           <Grid size={{xs: 12, sm: 6}}>
@@ -163,6 +175,19 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
           </div>
         </Box>
       </Paper>
+
+      <ConfirmationDialog
+        open={deleteRequested}
+        onClose={isAccepted => {
+          setDeleteRequested(false)
+          if (isAccepted) {
+            Entities.removeLevel(entity, entityLevel)
+            closeModal()
+          }
+        }}
+        title={`Delete ${entity.name} Level ${entityLevel.level}?`}
+        desc={`Are you sure, you want to delete ${entity.name} of Level ${entityLevel.level}?`}
+      />
     </Container>
   );
 }

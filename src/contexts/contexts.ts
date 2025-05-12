@@ -8,6 +8,7 @@ export interface EntitiesContextProps {
   updateEntity: <T extends keyof Entity>(id: string, key: T, value: Entity[T]) => void,
   addLevel: (entity: Entity, newLevel: EntityLevel) => void,
   editLevel: (entity: Entity, updatedLevel: EntityLevel) => void,
+  removeLevel: (entity: Entity, entityLevel: EntityLevel) => void,
 }
 export const EntitiesContext = createContext<EntitiesContextProps | undefined>(undefined)
 

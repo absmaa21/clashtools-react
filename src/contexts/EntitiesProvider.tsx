@@ -48,8 +48,14 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     notify.show(`Successfully edited Level ${updatedLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
   }
 
+  function removeLevel(entity: Entity, entityLevel: EntityLevel) {
+    entity.levels = [...entity.levels.filter(l => l.level !== entityLevel.level)]
+    setEntities(p => [...p.filter(e => e.id !== entity.id), entity])
+    notify.show(`Successfully deleted Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+  }
+
   return (
-    <EntitiesContext.Provider value={{entities, addEntity, updateEntity, addLevel, editLevel}}>
+    <EntitiesContext.Provider value={{entities, addEntity, updateEntity, addLevel, editLevel, removeLevel}}>
       {children}
     </EntitiesContext.Provider>
   );
