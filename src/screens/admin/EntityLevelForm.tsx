@@ -126,6 +126,22 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
               onChange={(e) => handleChange('upgradeTime', parseInt(e.target.value) || 0)}
             />
           </Grid>
+
+          <Grid size={1}>
+            <img
+              src={entityLevel.imgPath} alt={'Image Preview'}
+              style={{ height: 40 }}
+            />
+          </Grid>
+          <Grid size={11}>
+            <TextField
+              fullWidth
+              label="Image Url"
+              type="url"
+              value={entityLevel.imgPath}
+              onChange={e => handleChange('imgPath', e.target.value)}
+            />
+          </Grid>
         </Grid>
 
         <Divider sx={{ my: 3 }} />
