@@ -16,11 +16,13 @@ const LoginScreen = ({onSuccess}: Props) => {
     const formData = new FormData(e.currentTarget)
 
     Client.login(formData.get('username') as string, formData.get('password') as string).then(error => {
-      if (typeof error !== 'string' && error) {
-        setError(error.message)
+      if (!error) {
+        if (onSuccess) onSuccess()
         return
       }
-      if (onSuccess) onSuccess()
+
+      if (typeof error === 'string') setError(error)
+      else setError(error.message)
     })
   }
 

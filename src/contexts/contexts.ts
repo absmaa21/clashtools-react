@@ -16,7 +16,6 @@ export const EntitiesContext = createContext<EntitiesContextProps | undefined>(u
 
 export interface ClientContextProps {
   user: User | null,
-  tokens: Tokens,
   login: (username: string, password: string) => Promise<ErrorResponse | string | null>,
   register: (username: string, email: string, password: string) => Promise<ErrorResponse | string | null>,
   logout: () => Promise<void>,

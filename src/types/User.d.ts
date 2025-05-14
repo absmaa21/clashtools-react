@@ -1,6 +1,4 @@
 interface User {
-  id: number,
   username: string,
-  email: string,
-  role: string,
+  roles: ('ROLE_USER' | 'ROLE_ADMIN')[],
 }

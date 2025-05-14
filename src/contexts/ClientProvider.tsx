@@ -1,46 +1,54 @@
 import {ReactNode, useEffect, useState} from "react";
 import { ClientContext } from "./contexts";
-import {Storage} from "../utils/Storage"
 import {base_url} from "../env.ts";
 import axios from "axios";
 import {useNotifications} from "@toolpad/core";
 import {ErrorResponse} from "../types/ApiResponse.ts";
-import {jwtDecode, JwtPayload} from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+import Cookies from 'js-cookie'
 
 interface ClientProviderProps {
   children: ReactNode,
 }
 
-const emptyTokens: Tokens = {
-  accessToken: '',
-  refreshToken: '',
-}
-
 function ClientProvider({children}: ClientProviderProps) {
 
   const notify = useNotifications()
-
   const [user, setUser] = useState<User | null>(null)
-  const [tokens, setTokens] = useState<Tokens>(emptyTokens)
-  useEffect(() => {
-    refreshToken()
-    if (!isAccessTokenValid()) {
-      const loaded_user = Storage.load("user")
-      if (loaded_user) setUser(JSON.parse(loaded_user))
-      const loaded_tokens = Storage.load('user_tokens')
-      if (loaded_tokens) setTokens(JSON.parse(loaded_tokens))
-    }
-  }, [tokens]);
 
+  useEffect(() => {
+    if (isAccessTokenValid()) refreshUser()
+    else refreshToken().then(r => r === null && console.log('Tokens refreshed.'))
+  }, []);
+
+  function refreshUser(accessToken?: AccessToken) {
+    if (!accessToken) {
+      const raw = Cookies.get('access_token')!
+      accessToken = jwtDecode<AccessToken>(raw)
+    }
+
+    setUser({
+      username: accessToken.sub,
+      roles: accessToken.roles,
+    })
+  }
+
+  function setTokens(accessToken: string, refreshToken: string) {
+    const decodedAccess = jwtDecode<AccessToken>(accessToken)
+    Cookies.set('access_token', accessToken, { expires: decodedAccess.exp })
+    Cookies.set('refresh_token', refreshToken)
+    refreshUser(decodedAccess)
+  }
 
   async function login(username: string, password: string): Promise<ErrorResponse | string | null> {
     try {
       const response = await axios.post<Tokens>(`${base_url}/api/auth/login`, {username, password})
-      setTokens(response.data)
+      setTokens(response.data.accessToken, response.data.refreshToken)
       notify.show('Login successful.', {autoHideDuration: 1000, severity: 'success'})
       return null
     } catch (e) {
       if (axios.isAxiosError<ErrorResponse>(e) && e.response) return e.response.data
+      console.log(e)
     }
     return 'Something went wrong'
   }
@@ -60,9 +68,10 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   async function logout() {
-    Storage.remove("user_tokens")
-    setTokens(emptyTokens)
-    await axios.post(`${base_url}/api/auth/logout`)
+    Cookies.remove('access_token')
+    Cookies.remove('refresh_token')
+    // Thomas: "Braucht noch bissl Entwicklung"
+    // await axios.post(`${base_url}/api/auth/logout`)
   }
 
 
@@ -72,8 +81,15 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   async function refreshToken(): Promise<ErrorResponse | string | null> {
+    const refreshToken = Cookies.get('refresh_token')
+    if (!refreshToken) {
+      await logout()
+      return 'No refresh token found'
+    }
+
     try {
-      const response = axios.post(`${base_url}/api/auth/refresh`, {refreshToken: tokens.refreshToken})
+      const response = await axios.post<Tokens>(`${base_url}/api/auth/refresh`, {refreshToken: refreshToken})
+      setTokens(response.data.accessToken, response.data.refreshToken)
     } catch (e) {
       if (axios.isAxiosError<ErrorResponse>(e) && e.response) {
         await logout()
@@ -82,26 +98,27 @@ function ClientProvider({children}: ClientProviderProps) {
       console.error('refreshToken error was invalid!', e)
       return 'Something went wrong'
     }
+
     return null
   }
 
 
   function isAccessTokenValid(): boolean {
-    if (tokens.accessToken.length === 0) return false
+    const accessToken = Cookies.get('access_token')
+    if (!accessToken) return false
+
     try {
-      console.log(tokens.accessToken)
-      const decodedToken = jwtDecode<JwtPayload>(tokens.accessToken)
-      console.log(decodedToken)
+      const decoded = jwtDecode<AccessToken>(accessToken)
+      return decoded.exp * 1000 > Date.now()
     } catch (e) {
       console.warn('Error while decoding Access Token ', e)
       return false
     }
-    return true
   }
 
 
   return (
-    <ClientContext.Provider value={{user, tokens, login, register, logout, isLoggedIn}}>
+    <ClientContext.Provider value={{user, login, register, logout, isLoggedIn}}>
       {children}
     </ClientContext.Provider>
   );
