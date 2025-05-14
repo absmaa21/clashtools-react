@@ -3,25 +3,27 @@ import {Box, List, ListItem, ListItemButton, ListItemText, Modal, Tab, Tabs, Typ
 import {useState} from "react";
 import {Category} from "../../enums/Category.ts";
 import EntityLevelForm from "./EntityLevelForm.tsx";
+import EntityForm from "./EntityForm.tsx";
 
 function AdminDashboard() {
 
   const tabCategories = Object.values(Category).filter(c => typeof c === 'string')
   const [activeTab, setActiveTab] = useState<Category>(0)
   const [editEntityLevel, setEditEntityLevel] = useState<EntityLevel>()
+  const [editEntity, setEditEntity] = useState<Entity>()
 
   const {entities} = useEntities()
 
   return (
     <Box sx={{width: '100%'}}>
-      <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+      <Box>
         <Tabs value={activeTab} onChange={(_e, v: number) => setActiveTab(v)} aria-label="basic tabs example">
           {tabCategories.map(c => <Tab key={c} label={c}/>)}
         </Tabs>
 
         <List>
           {entities.filter(e => e.category === activeTab).map(e => <>
-              <ListItem key={e.id}>
+              <ListItem key={e.id} sx={{borderBottom: 1, borderColor: 'divider'}}>
                 <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
                   <ListItemText primary={e.name}/>
                   {e.levels.map(l => (
@@ -32,34 +34,51 @@ function AdminDashboard() {
                       </Box>
                     </ListItemButton>
                   ))}
-                </Box>
-              </ListItem>
 
-              <ListItem key={'Add'}>
-                <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
-                  <ListItemButton onClick={() => setEditEntityLevel({
-                    id: '',
-                    level: e.levels[e.levels.length-1].level+1,
-                    stats: e.levels[e.levels.length-1].stats,
-                    cost: 0,
-                    resource: e.levels[e.levels.length-1].resource,
-                    upgradeTime: 0,
-                    imgPath: e.levels[e.levels.length-1].imgPath,
-                  })}>
+                  <ListItemButton
+                    key={e.name + '-addnew'}
+                    onClick={() => setEditEntityLevel({
+                      id: '',
+                      level: e.levels[e.levels.length - 1].level + 1,
+                      stats: e.levels[e.levels.length - 1].stats,
+                      cost: 0,
+                      resource: e.levels[e.levels.length - 1].resource,
+                      upgradeTime: 0,
+                      imgPath: e.levels[e.levels.length - 1].imgPath,
+                    })}>
                     Add
                   </ListItemButton>
                 </Box>
               </ListItem>
 
-              <Modal
-                open={!!editEntityLevel} onClose={() => setEditEntityLevel(undefined)}
-                sx={{placeSelf: 'center'}}
-              >
-                <EntityLevelForm entity={e} initEntityLevel={editEntityLevel!}
-                                 closeModal={() => setEditEntityLevel(undefined)}/>
-              </Modal>
+            <Modal
+              open={!!editEntityLevel} onClose={() => setEditEntityLevel(undefined)}
+              sx={{placeSelf: 'center'}}
+            >
+              <EntityLevelForm entity={e} initEntityLevel={editEntityLevel!}
+                               closeModal={() => setEditEntityLevel(undefined)}/>
+            </Modal>
             </>
           )}
+
+          <ListItem>
+            <ListItemButton onClick={() => setEditEntity({
+              id: '',
+              name: '',
+              category: activeTab,
+              maxLevel: 4,
+              levels: [],
+            })}>
+              Add new Entity
+            </ListItemButton>
+          </ListItem>
+
+          <Modal
+            open={!!editEntity} onClose={() => setEditEntity(undefined)}
+            sx={{placeSelf: 'center'}}
+          >
+            <EntityForm initEntity={editEntity!} closeModal={() => setEditEntity(undefined)}/>
+          </Modal>
         </List>
       </Box>
     </Box>

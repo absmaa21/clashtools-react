@@ -17,7 +17,8 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     notify.show(`Successfully added ${newEntity.name}`, {autoHideDuration: 1000, severity: 'success'})
   }
 
-  function updateEntity<T extends keyof Entity>(id: string, key: T, value: Entity[T]) {
+  /*
+  function patchEntity<T extends keyof Entity>(id: string, key: T, value: Entity[T]) {
     const oldEntity = entities.find(e => e.id === id)
 
     if (!oldEntity) {
@@ -29,6 +30,31 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     setEntities(p => [...p.filter(e => e.id !== id), oldEntity])
 
     notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+  }
+   */
+
+  function updateEntity(newEntity: Entity) {
+    const oldEntity = entities.find(e => e.id === newEntity.id)
+
+    if (!oldEntity) {
+      notify.show(`Entity with id ${newEntity.id} not found!`, {autoHideDuration: 2000, severity: 'error'})
+      return
+    }
+
+    setEntities(p => [...p.filter(e => e.id !== newEntity.id), newEntity])
+
+    notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+  }
+
+  function removeEntity(id: string) {
+    const entity = entities.find(e => e.id === id)
+    if (!entity) {
+      notify.show(`Entity with id ${id} not found!`, {autoHideDuration: 2000, severity: 'error'})
+      return
+    }
+
+    setEntities(p => [...p.filter(e => e.id !== id)])
+    notify.show(`Successfully deleted ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
   }
 
   function addLevel(entity: Entity, newLevel: EntityLevel) {
@@ -55,7 +81,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
   }
 
   return (
-    <EntitiesContext.Provider value={{entities, addEntity, updateEntity, addLevel, editLevel, removeLevel}}>
+    <EntitiesContext.Provider value={{entities, addEntity, updateEntity, addLevel, editLevel, removeLevel, removeEntity}}>
       {children}
     </EntitiesContext.Provider>
   );

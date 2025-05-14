@@ -5,7 +5,8 @@ import {ErrorResponse} from "../types/ApiResponse.ts";
 export interface EntitiesContextProps {
   entities: Entity[],
   addEntity: (newEntity: Entity) => void,
-  updateEntity: <T extends keyof Entity>(id: string, key: T, value: Entity[T]) => void,
+  updateEntity: (newEntity: Entity) => void,
+  removeEntity: (id: string) => void,
   addLevel: (entity: Entity, newLevel: EntityLevel) => void,
   editLevel: (entity: Entity, updatedLevel: EntityLevel) => void,
   removeLevel: (entity: Entity, entityLevel: EntityLevel) => void,

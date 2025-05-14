@@ -25,15 +25,7 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
 
   const isNew: boolean = initEntityLevel.id.length === 0
   const Entities = useEntities()
-  const [entityLevel, setEntityLevel] = useState<EntityLevel>(initEntityLevel ?? {
-    id: '',
-    level: 0,
-    stats: [],
-    cost: 0,
-    resource: ResourceType.GOLD,
-    upgradeTime: 0,
-    imgPath: '',
-  })
+  const [entityLevel, setEntityLevel] = useState<EntityLevel>(initEntityLevel)
   const [deleteRequested, setDeleteRequested] = useState<boolean>(false)
 
   const handleChange = (field: keyof EntityLevel, value: string | number) => {
