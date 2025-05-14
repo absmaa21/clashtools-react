@@ -1,9 +1,10 @@
 import useEntities from "../../hooks/useEntities.ts";
-import {Box, List, ListItem, ListItemButton, ListItemText, Modal, Tab, Tabs, Typography} from "@mui/material";
+import {Box, List, ListItem, ListItemButton, Modal, Tab, Tabs, Typography} from "@mui/material";
 import {useState} from "react";
 import {Category} from "../../enums/Category.ts";
 import EntityLevelForm from "./EntityLevelForm.tsx";
 import EntityForm from "./EntityForm.tsx";
+import {ResourceType} from "../../enums/ResourceType.ts";
 
 function AdminDashboard() {
 
@@ -22,10 +23,12 @@ function AdminDashboard() {
         </Tabs>
 
         <List>
-          {entities.filter(e => e.category === activeTab).map(e => <>
+          {entities.filter(e => e.category === activeTab).map(e => <div key={e.id}>
               <ListItem key={e.id} sx={{borderBottom: 1, borderColor: 'divider'}}>
                 <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
-                  <ListItemText primary={e.name}/>
+                  <ListItemButton onClick={() => setEditEntity(e)}>
+                    {e.name}
+                  </ListItemButton>
                   {e.levels.map(l => (
                     <ListItemButton key={l.id} onClick={() => setEditEntityLevel(l)}>
                       <Box sx={{textAlign: 'center'}}>
@@ -39,29 +42,29 @@ function AdminDashboard() {
                     key={e.name + '-addnew'}
                     onClick={() => setEditEntityLevel({
                       id: '',
-                      level: e.levels[e.levels.length - 1].level + 1,
-                      stats: e.levels[e.levels.length - 1].stats,
+                      level: e.levels[e.levels.length - 1]?.level + 1 || 1,
+                      stats: e.levels[e.levels.length - 1]?.stats || [],
                       cost: 0,
-                      resource: e.levels[e.levels.length - 1].resource,
+                      resource: e.levels[e.levels.length - 1]?.resource || ResourceType.GOLD,
                       upgradeTime: 0,
-                      imgPath: e.levels[e.levels.length - 1].imgPath,
+                      imgPath: e.levels[e.levels.length - 1]?.imgPath || '',
                     })}>
                     Add
                   </ListItemButton>
                 </Box>
               </ListItem>
 
-            <Modal
-              open={!!editEntityLevel} onClose={() => setEditEntityLevel(undefined)}
-              sx={{placeSelf: 'center'}}
-            >
-              <EntityLevelForm entity={e} initEntityLevel={editEntityLevel!}
-                               closeModal={() => setEditEntityLevel(undefined)}/>
-            </Modal>
-            </>
+              <Modal
+                open={!!editEntityLevel} onClose={() => setEditEntityLevel(undefined)}
+                sx={{placeSelf: 'center'}}
+              >
+                <EntityLevelForm entity={e} initEntityLevel={editEntityLevel!}
+                                 closeModal={() => setEditEntityLevel(undefined)}/>
+              </Modal>
+            </div>
           )}
 
-          <ListItem>
+          <ListItem key={'new-entity-item'}>
             <ListItemButton onClick={() => setEditEntity({
               id: '',
               name: '',

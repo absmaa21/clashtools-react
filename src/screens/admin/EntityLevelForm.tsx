@@ -101,9 +101,9 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
               value={entityLevel.resource}
               onChange={(e) => handleChange('resource', e.target.value)}
             >
-              {Object.values(ResourceType).filter(t => typeof t === 'string').map(type => (
-                <MenuItem key={type} value={type}>
-                  {type}
+              {Object.values(ResourceType).filter(t => typeof t !== 'string').map(type => (
+                <MenuItem key={ResourceType[type]} value={type}>
+                  {ResourceType[type]}
                 </MenuItem>
               ))}
             </TextField>
@@ -121,7 +121,7 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
 
           <Grid size={1}>
             <img
-              src={entityLevel.imgPath} alt={'Image Preview'}
+              src={entityLevel.imgPath.length > 0 ? entityLevel.imgPath : undefined} alt={'Image Preview'}
               style={{ height: 40 }}
             />
           </Grid>
