@@ -109,7 +109,7 @@ function UserAvatar() {
     <Box sx={{flexGrow: 0}}>
       <Tooltip title="Open settings">
         <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-          <Avatar alt={Client.authToken}/>
+          <Avatar alt={Client.user?.username}/>
         </IconButton>
       </Tooltip>
       <Menu
@@ -136,7 +136,7 @@ function UserAvatar() {
         </MenuItem>
       </Menu>
 
-      <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)}>
+      <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)} sx={{ placeSelf: 'center', width: '100%' }}>
         <SettingsScreen/>
       </Modal>
     </Box>

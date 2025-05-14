@@ -6,7 +6,7 @@ function SettingsScreen() {
   const Settings = useSettings()
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="md">
       <Paper elevation={3} sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>
           Settings

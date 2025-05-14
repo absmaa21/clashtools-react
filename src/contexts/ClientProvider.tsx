@@ -21,6 +21,12 @@ function ClientProvider({children}: ClientProviderProps) {
     else refreshToken().then(r => r === null && console.log('Tokens refreshed.'))
   }, []);
 
+
+  function isLoggedIn() {
+    return user !== null && isAccessTokenValid()
+  }
+
+
   function refreshUser(accessToken?: AccessToken) {
     if (!accessToken) {
       const raw = Cookies.get('access_token')!
@@ -33,12 +39,14 @@ function ClientProvider({children}: ClientProviderProps) {
     })
   }
 
+
   function setTokens(accessToken: string, refreshToken: string) {
     const decodedAccess = jwtDecode<AccessToken>(accessToken)
-    Cookies.set('access_token', accessToken, { expires: decodedAccess.exp })
-    Cookies.set('refresh_token', refreshToken)
+    Cookies.set('access_token', accessToken, { expires: decodedAccess.exp, sameSite: 'strict', secure: true })
+    Cookies.set('refresh_token', refreshToken, { sameSite: 'strict', secure: true })
     refreshUser(decodedAccess)
   }
+
 
   async function login(username: string, password: string): Promise<ErrorResponse | string | null> {
     try {
@@ -72,11 +80,6 @@ function ClientProvider({children}: ClientProviderProps) {
     Cookies.remove('refresh_token')
     // Thomas: "Braucht noch bissl Entwicklung"
     // await axios.post(`${base_url}/api/auth/logout`)
-  }
-
-
-  function isLoggedIn(): boolean {
-    return isAccessTokenValid()
   }
 
 
