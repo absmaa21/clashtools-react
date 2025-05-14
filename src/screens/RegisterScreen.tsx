@@ -25,11 +25,6 @@ const RegisterScreen = ({onSuccess}: Props) => {
       return
     }
 
-    if (password.length < 8) {
-      setErrors(p => ({...p, password: 'Password length must be 8 or greater!'}))
-      return
-    }
-
     Client.register(username, email, password).then(error => {
       if (typeof error !== 'string' && error) {
         setErrors(p => ({

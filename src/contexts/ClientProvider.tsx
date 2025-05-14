@@ -74,8 +74,6 @@ function ClientProvider({children}: ClientProviderProps) {
   async function refreshToken(): Promise<ErrorResponse | string | null> {
     try {
       const response = axios.post(`${base_url}/api/auth/refresh`, {refreshToken: tokens.refreshToken})
-      console.log('Token refreshed')
-      console.log(response)
     } catch (e) {
       if (axios.isAxiosError<ErrorResponse>(e) && e.response) {
         await logout()
