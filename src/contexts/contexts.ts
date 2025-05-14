@@ -4,12 +4,12 @@ import {ErrorResponse} from "../types/ApiResponse.ts";
 
 export interface EntitiesContextProps {
   entities: Entity[],
-  addEntity: (newEntity: Entity) => void,
-  updateEntity: (newEntity: Entity) => void,
-  removeEntity: (id: string) => void,
-  addLevel: (entity: Entity, newLevel: EntityLevel) => void,
-  editLevel: (entity: Entity, updatedLevel: EntityLevel) => void,
-  removeLevel: (entity: Entity, entityLevel: EntityLevel) => void,
+  addEntity: (newEntity: Entity) => Promise<void>,
+  updateEntity: (newEntity: Entity) => Promise<void>,
+  removeEntity: (id: string) => Promise<void>,
+  addLevel: (entity: Entity, newLevel: EntityLevel) => Promise<void>,
+  editLevel: (entity: Entity, updatedLevel: EntityLevel) => Promise<void>,
+  removeLevel: (entity: Entity, entityLevel: EntityLevel) => Promise<void>,
 }
 export const EntitiesContext = createContext<EntitiesContextProps | undefined>(undefined)
 
