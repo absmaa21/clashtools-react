@@ -15,19 +15,33 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
   const [entities, setEntities] = useState<Entity[]>([])
 
   useEffect(() => {
-    if (skipNetwork) setEntities(demoEntities)
-    else {
-      console.warn('No fetch for getting all entities')
-    }
+    getEntities()
   }, []);
 
-  async function addEntity(newEntity: Entity) {
+  async function getEntities() {
+    if (skipNetwork) {
+      setEntities(demoEntities)
+      return
+    }
+
     try {
-      if (skipNetwork) setEntities(p => [...p, newEntity])
-      else {
-        console.warn('No post for adding a new entity')
-      }
-      notify.show(`Successfully added ${newEntity.name}`, {autoHideDuration: 1000, severity: 'success'})
+      console.warn('No fetch for getting all entities')
+    } catch (e) {
+      if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Get Entities: AxiosError')
+      notify.show(`Something went wrong getting entities.`, {autoHideDuration: 2000, severity: 'error'})
+    }
+  }
+
+  async function addEntity(newEntity: Entity) {
+    const newEntities: Entity[] = [...entities, newEntity]
+    if (skipNetwork) {
+      setEntities(newEntities)
+      return
+    }
+
+    try {
+      console.warn('No post for adding a new entity')
+      //notify.show(`Successfully added ${newEntity.name}`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Add Entity: AxiosError')
       notify.show(`Something went wrong adding ${newEntity.name}.`, {autoHideDuration: 2000, severity: 'error'})
@@ -52,18 +66,20 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
 
   async function updateEntity(newEntity: Entity) {
     const oldEntity = entities.find(e => e.id === newEntity.id)
-
     if (!oldEntity) {
       notify.show(`Entity with id ${newEntity.id} not found!`, {autoHideDuration: 2000, severity: 'error'})
       return
     }
 
+    const newEntities: Entity[] = [...entities.filter(e => e.id !== newEntity.id), newEntity]
+    if (skipNetwork) {
+      setEntities(newEntities)
+      return
+    }
+
     try {
-      if (skipNetwork) setEntities(p => [...p.filter(e => e.id !== newEntity.id), newEntity])
-      else {
-        console.warn('No put for updating entities')
-      }
-      notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      console.warn('No put for updating entities')
+      //notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Update Entity: AxiosError')
       notify.show(`Something went wrong updating ${newEntity.name}.`, {autoHideDuration: 2000, severity: 'error'})
@@ -77,15 +93,15 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       return
     }
 
-    setEntities(p => [...p.filter(e => e.id !== id)])
-    notify.show(`Successfully deleted ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+    const newEntities: Entity[] = entities.filter(e => e.id !== id)
+    if (skipNetwork) {
+      setEntities(newEntities)
+      return
+    }
 
     try {
-      if (skipNetwork) setEntities(p => [...p.filter(e => e.id !== id)])
-      else {
-        console.warn('No delete for removing entities')
-      }
-      notify.show(`Successfully removed ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      console.warn('No delete for removing entities')
+      //notify.show(`Successfully removed ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Remove Entity: AxiosError')
       notify.show(`Something went wrong updating ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
@@ -98,15 +114,16 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       return
     }
 
+    entity.levels.push(newLevel)
+    const newEntities: Entity[] = [...entities.filter(e => e.id !== entity.id), entity]
+    if (skipNetwork) {
+      setEntities(newEntities)
+      return
+    }
+
     try {
-      if (skipNetwork) {
-        entity.levels.push(newLevel)
-        setEntities(p => [...p.filter(e => e.id !== entity.id), entity])
-      }
-      else {
-        console.warn('No post for adding a new entity level')
-      }
-      notify.show(`Successfully added Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      console.warn('No post for adding a new entity level')
+      //notify.show(`Successfully added Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Add EntityLevel: AxiosError')
       notify.show(`Error while adding Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
@@ -114,14 +131,16 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
   }
 
   async function editLevel(entity: Entity, updatedLevel: EntityLevel) {
+    entity.levels = [...entity.levels.filter(l => l.level !== updatedLevel.level), updatedLevel]
+    const newEntities: Entity[] = [...entities.filter(e => e.id !== entity.id), entity]
+    if (skipNetwork) {
+      setEntities(newEntities)
+      return
+    }
+
     try {
-      if (skipNetwork) {
-        entity.levels = [...entity.levels.filter(l => l.level !== updatedLevel.level), updatedLevel]
-        setEntities(p => [...p.filter(e => e.id !== entity.id), entity])
-      } else {
-        console.warn('No put for updating a entity level')
-      }
-      notify.show(`Successfully edited Level ${updatedLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      console.warn('No put for updating a entity level')
+      //notify.show(`Successfully edited Level ${updatedLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Edit EntityLevel: AxiosError')
       notify.show(`Error while editing Level ${updatedLevel.level} for ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
@@ -129,14 +148,16 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
   }
 
   async function removeLevel(entity: Entity, entityLevel: EntityLevel) {
+    entity.levels = [...entity.levels.filter(l => l.level !== entityLevel.level)]
+    const newEntities: Entity[] = [...entities.filter(e => e.id !== entity.id), entity]
+    if (skipNetwork) {
+      setEntities(newEntities)
+      return
+    }
+
     try {
-      if (skipNetwork) {
-        entity.levels = [...entity.levels.filter(l => l.level !== entityLevel.level)]
-        setEntities(p => [...p.filter(e => e.id !== entity.id), entity])
-      } else {
-        console.warn('No delete for removing entity level')
-      }
-      notify.show(`Successfully deleted Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      console.warn('No delete for removing entity level')
+      //notify.show(`Successfully deleted Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Remove EntityLevel: AxiosError')
       notify.show(`Error while removing Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
