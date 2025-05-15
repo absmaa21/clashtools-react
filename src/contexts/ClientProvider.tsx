@@ -87,6 +87,7 @@ function ClientProvider({children}: ClientProviderProps) {
     const refreshToken = Cookies.get('refresh_token')
     if (!refreshToken) {
       await logout()
+      console.log('No refresh token found!')
       return 'No refresh token found'
     }
 
