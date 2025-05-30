@@ -15,22 +15,22 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
   const [entities, setEntities] = useState<Entity[]>([])
 
   useEffect(() => {
-    getEntities()
-  }, []);
+    async function getEntities() {
+      if (skipNetwork) {
+        setEntities(p => p.length > 0 ? p : demoEntities)
+        return
+      }
 
-  async function getEntities() {
-    if (skipNetwork) {
-      setEntities(demoEntities)
-      return
+      try {
+        console.warn('No fetch for getting all entities')
+      } catch (e) {
+        if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Get Entities: AxiosError')
+        notify.show(`Something went wrong getting entities.`, {autoHideDuration: 2000, severity: 'error'})
+      }
     }
+    getEntities().then()
+  }, [entities, notify]);
 
-    try {
-      console.warn('No fetch for getting all entities')
-    } catch (e) {
-      if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Get Entities: AxiosError')
-      notify.show(`Something went wrong getting entities.`, {autoHideDuration: 2000, severity: 'error'})
-    }
-  }
 
   async function addEntity(newEntity: Entity) {
     const newEntities: Entity[] = [...entities, newEntity]

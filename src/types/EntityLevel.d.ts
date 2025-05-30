@@ -4,7 +4,6 @@
 interface EntityLevel {
   id: string,
   level: number,
-  timeUntilCompleted?: number,
   stats: EntityStat[],
   cost: number,
   resource: ResourceType,

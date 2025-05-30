@@ -4,56 +4,61 @@ import BuildIcon from "@mui/icons-material/Build";
 import CheckIcon from "@mui/icons-material/Check";
 
 interface Props {
-  entity: Entity,
-  entityLevel: EntityLevel,
+  accountEntity: AccountEntity,
 }
 
-function LevelCol({entity, entityLevel}: Props) {
+function LevelCol({accountEntity}: Props) {
 
-  const handleUpgradePress = (entityLevel: EntityLevel) => {
-    console.log(entityLevel.id)
+  const displayLevel: EntityLevel = accountEntity.entity.levels
+      .filter(ae => ae.level > accountEntity.level)
+      .sort((a, b) => a.level - b.level)[0]
+    ?? accountEntity.entity.levels.find(ae => ae.level === accountEntity.level)
+
+  const handleUpgradePress = () => {
+    console.log(displayLevel)
   }
 
   return (
     <>
-      <TableCell sx={{padding: 0, width: '10%' }}>
+      <TableCell sx={{padding: 0, width: '10%'}}>
         <Box sx={{display: 'flex', justifyContent: 'center', gap: 2}}>
-          <img src={'https://www.clash.ninja/images/entities/127_7.png'} alt={entity.name + " image"}
-               width={24}/>
+          <img src={displayLevel.imgPath} alt={accountEntity.entity.name + " image"} height={48}/>
         </Box>
       </TableCell>
 
       <TableCell sx={{padding: 0, width: '10%'}}>
         <Box sx={{display: 'flex', justifyContent: 'center', gap: 2}}>
           <Typography variant={'body2'}>
-            {entityLevel.level} / {entity.maxLevel}
+            {accountEntity.level} / {accountEntity.entity.maxLevel}
           </Typography>
         </Box>
       </TableCell>
 
-      <TableCell sx={{borderRight: "solid 1px #0002", padding: 0, width: { xs: 100, sm: '10%' } }}>
+      <TableCell sx={{borderRight: "solid 1px #0002", padding: 0, width: {xs: 100, sm: '10%'}}}>
         <Box sx={{display: 'flex', justifyContent: 'center', gap: 2}}>
-          <Button
-            variant={'contained'}
-            size={'small'}
-            onClick={() => handleUpgradePress(entityLevel)}
-            sx={{minWidth: 0, width: 28, aspectRatio: '1'}}
-            color={entityLevel.timeUntilCompleted ? 'warning' : 'primary'}
-          >
-            {!entityLevel.timeUntilCompleted
-              ? <ArrowUpwardIcon fontSize={'small'}/>
-              : <BuildIcon fontSize={'small'}/>
-            }
-          </Button>
-          {entityLevel.timeUntilCompleted && <Button
+          {displayLevel.level !== accountEntity.level ? <>
+            <Button
               variant={'contained'}
               size={'small'}
-              onClick={() => console.log("finish")}
+              onClick={handleUpgradePress}
               sx={{minWidth: 0, width: 28, aspectRatio: '1'}}
-              color={'success'}
-          >
-              <CheckIcon fontSize={'small'}/>
-          </Button>}
+              color={accountEntity.upgradeStart ? 'warning' : 'primary'}
+            >
+              {!accountEntity.upgradeStart
+                ? <ArrowUpwardIcon fontSize={'small'}/>
+                : <BuildIcon fontSize={'small'}/>
+              }
+            </Button>
+            {accountEntity.upgradeStart && <Button
+                variant={'contained'}
+                size={'small'}
+                onClick={() => console.log("finish")}
+                sx={{minWidth: 0, width: 28, aspectRatio: '1'}}
+                color={'success'}
+            >
+                <CheckIcon fontSize={'small'}/>
+            </Button>}
+          </> : <CheckIcon color={'success'}/>}
         </Box>
       </TableCell>
     </>

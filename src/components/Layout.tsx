@@ -24,6 +24,7 @@ function Layout() {
           overflow: 'auto',
           bgcolor: '#ffffff05'
         }}
+        style={{padding: 0}}
       >
         <Outlet />
       </Container>

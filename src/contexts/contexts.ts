@@ -29,3 +29,12 @@ export interface SettingsContextProps {
   setReducedMotion: React.Dispatch<SetStateAction<boolean>>,
 }
 export const SettingsContext = createContext<SettingsContextProps | undefined>(undefined)
+
+
+export interface AccountEntityProps {
+  accountEntities: AccountEntity[],
+  startUpgrade: (id: string) => Promise<ErrorResponse | string | null>,
+  editUpgrade: (updatedUpgrade: AccountEntity) => Promise<ErrorResponse | string | null>
+  cancelUpgrade: (id: string) => Promise<ErrorResponse | string | null>,
+}
+export const AccountEntityContext = createContext<AccountEntityProps | undefined>(undefined)

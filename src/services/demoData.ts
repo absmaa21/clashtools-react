@@ -3,7 +3,7 @@ import {ResourceType} from "../enums/ResourceType.ts";
 
 export const demoEntities: Entity[] = [
   {
-    id: "hero_001",
+    id: "hero_king",
     name: "Barbarian King",
     category: Category.HERO,
     maxLevel: 100,
@@ -39,7 +39,7 @@ export const demoEntities: Entity[] = [
     ],
   },
   {
-    id: "troop_001",
+    id: "troop_archer",
     name: "Archer",
     category: Category.TROOP,
     maxLevel: 18,
@@ -73,7 +73,7 @@ export const demoEntities: Entity[] = [
     ],
   },
   {
-    id: "defense_001",
+    id: "defense_archer_tower",
     name: "Archer Tower",
     category: Category.DEFENSE,
     maxLevel: 21,
@@ -92,19 +92,110 @@ export const demoEntities: Entity[] = [
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/6/6e/Archer_Tower1.png',
       },
       {
-        id: "archertower_lvl_5",
-        level: 5,
-        stats: [
-          { key: "Hitpoints", value: 620 },
-          { key: "Damage per Second", value: 30 },
-          { key: "Range", value: 10 },
-        ],
+        id: 'archertower_lvl_5',
+        level: 2,
+        stats: [],
         resource: ResourceType.GOLD,
-        cost: 20000,
-        upgradeTime: 60 * 60,
+        cost: 70_000,
+        upgradeTime: (60 + 30) * 60,
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/e/e8/Archer_Tower5.png',
+      },
+      {
+        id: 'archertower_lvl_21',
+        level: 3,
+        stats: [],
+        resource: ResourceType.GOLD,
+        cost: 4_000_000,
+        upgradeTime: (3 * 24) * 60 * 60,
+        imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/f/fa/Archer_Tower21.png',
       },
     ],
   },
+  {
+    id: 'defense_cannon',
+    name: 'Cannon',
+    category: Category.DEFENSE,
+    maxLevel: 21,
+    levels: [
+      {
+        id: 'cannon_lvl_1',
+        level: 1,
+        stats: [],
+        resource: ResourceType.GOLD,
+        cost: 250,
+        upgradeTime: 5,
+        imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/a/a1/Cannon1.png',
+      },
+      {
+        id: 'cannon_lvl_20',
+        level: 20,
+        stats: [],
+        resource: ResourceType.GOLD,
+        cost: 2_600_000,
+        upgradeTime: (24 + 12) * 60 * 60,
+        imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/7/71/Cannon20B.png',
+      },
+      {
+        id: 'cannon_lvl_21',
+        level: 21,
+        stats: [],
+        resource: ResourceType.GOLD,
+        cost: 3_000_000,
+        upgradeTime: (2 * 24) * 60 * 60,
+        imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/8/85/Cannon21B.png',
+      },
+    ],
+  },
+]
 
+
+export const demoAccountEntities: AccountEntity[] = [
+  // ARCHER TOWERS
+  {
+    id: 'archer_tower_1',
+    entity: demoEntities[2],
+    level: 0,
+  },
+  {
+    id: 'archer_tower_2',
+    entity: demoEntities[2],
+    level: 1,
+    upgradeStart: Date.now() - 7987,
+  },
+  {
+    id: 'archer_tower_3',
+    entity: demoEntities[2],
+    level: 2,
+    upgradeStart: Date.now() - 4548251,
+  },
+  {
+    id: 'archer_tower_4',
+    entity: demoEntities[2],
+    level: 3,
+  },
+
+  // CANNONS
+  {
+    id: 'cannon_1',
+    entity: demoEntities[3],
+    level: 0,
+  },
+  {
+    id: 'cannon_2',
+    entity: demoEntities[3],
+    level: 20,
+    upgradeStart: Date.now() - 4345,
+  },
+  {
+    id: 'cannon_3',
+    entity: demoEntities[3],
+    level: 21,
+  },
+
+  // ARCHER
+  {
+    id: 'archer',
+    entity: demoEntities[1],
+    level: 0,
+  },
 ]
