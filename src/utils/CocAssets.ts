@@ -8,5 +8,7 @@ export function getResourceByType(type: ResourceType): string {
     case ResourceType.SHINY_ORE: return 'https://static.wikia.nocookie.net/clashofclans/images/d/da/Shiny_Ore.png'
     case ResourceType.GLOWY_ORE: return 'https://static.wikia.nocookie.net/clashofclans/images/7/72/Glowy_Ore.png'
     case ResourceType.STARRY_ORE: return 'https://static.wikia.nocookie.net/clashofclans/images/0/07/Starry_Ore.png'
+    case ResourceType.GEMS: return 'https://static.wikia.nocookie.net/clashofclans/images/2/20/Gem_info.png'
+    case ResourceType.RAID_MEDALS: return 'https://static.wikia.nocookie.net/clashofclans/images/5/52/Raid_Medal.png'
   }
 }
