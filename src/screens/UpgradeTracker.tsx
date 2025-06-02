@@ -15,6 +15,7 @@ import UpgradeCol from "../components/upgrade-tracker/UpgradeCol.tsx";
 import {useState} from "react";
 import useAccountEntity from "../hooks/useAccountEntity.ts";
 import useEntities from "../hooks/useEntities.ts";
+import {snakeToHumanReadable} from "../utils/StringMethods.ts";
 
 const UpgradeTracker = () => {
 
@@ -32,7 +33,7 @@ const UpgradeTracker = () => {
         onChange={(_e, v: number) => setActiveTab(v)}
         variant={'scrollable'} style={{marginBottom: 32}}
       >
-        {tabCategories.sort((a, b) => a.localeCompare(b)).map(c => <Tab key={c} label={c}/>)}
+        {tabCategories.sort((a, b) => a.localeCompare(b)).map(c => <Tab key={c} label={snakeToHumanReadable(c)}/>)}
       </Tabs>
 
       <Box sx={{px: {xs: 0, lg: 4} }}>
@@ -123,7 +124,7 @@ const UpgradeTableHeader = ({categoryName}: {categoryName: string}) => {
   return (
     <TableHead sx={{bgcolor: '#1565c0'}}>
       <TableRow>
-        <TableCell sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>{categoryName}</TableCell>
+        <TableCell sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>{snakeToHumanReadable(categoryName)}</TableCell>
         <TableCell colSpan={3} sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Level</TableCell>
         <TableCell colSpan={0} sx={{color: 'white', fontWeight: 'bold', textAlign: 'center'}}>Details</TableCell>
       </TableRow>
