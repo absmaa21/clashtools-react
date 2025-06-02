@@ -3,10 +3,12 @@ import { useState } from "react";
 import MenuIcon from '@mui/icons-material/Menu';
 import UserAvatar from "./UserAvatar";
 import {useNavigate} from "react-router";
+import useClient from "../hooks/useClient.ts";
 
 interface Page {
   title: string,
   path: string,
+  adminOnly?: boolean,
   subPages?: {
     title: string,
     path: string,
@@ -15,12 +17,13 @@ interface Page {
 const pages: Page[] = [
   {title: 'Dashboard', path: '/'},
   {title: 'Upgrade Tracker', path: '/tracker'},
-  {title: 'Admin', path: '/admin'},
+  {title: 'Admin', path: '/admin', adminOnly: true},
 ];
 
 function Header() {
   const nav = useNavigate()
   const [anchorElNav, setAnchorElNav] = useState<null | HTMLElement>(null);
+  const Client = useClient()
 
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
@@ -29,6 +32,11 @@ function Header() {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
+
+  const pagesToShow: Page[] = pages.filter(p => {
+    if (!p.adminOnly) return true
+    return Client.isAdmin()
+  })
 
   return (
     <AppBar position="static">
@@ -78,7 +86,7 @@ function Header() {
               onClose={handleCloseNavMenu}
               sx={{display: {xs: 'block', md: 'none'}}}
             >
-              {pages.map(page => (
+              {pagesToShow.map(page => (
                 <MenuItem key={page.title} onClick={() => {
                   handleCloseNavMenu()
                   nav(page.path)
@@ -108,7 +116,7 @@ function Header() {
             ClashTools
           </Typography>
           <Box sx={{flexGrow: 1, display: {xs: 'none', md: 'flex'}}}>
-            {pages.map(page => (
+            {pagesToShow.map(page => (
               <Button
                 key={page.title}
                 onClick={() => {

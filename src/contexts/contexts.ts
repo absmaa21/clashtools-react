@@ -20,6 +20,7 @@ export interface ClientContextProps {
   register: (username: string, email: string, password: string) => Promise<ErrorResponse | string | null>,
   logout: () => Promise<void>,
   isLoggedIn: () => boolean,
+  isAdmin: () => boolean,
 }
 export const ClientContext = createContext<ClientContextProps | undefined>(undefined)
 

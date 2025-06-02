@@ -28,6 +28,14 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   function refreshUser(accessToken?: AccessToken) {
+    if (skipNetwork) {
+      setUser({
+        username: user?.username ?? 'DemoUser',
+        roles: ['ROLE_ADMIN'],
+      })
+      return
+    }
+
     if (!accessToken) {
       const raw = Cookies.get('access_token')!
       accessToken = jwtDecode<AccessToken>(raw)
@@ -94,6 +102,8 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   async function refreshToken(): Promise<ErrorResponse | string | null> {
+    if (skipNetwork) return null
+
     const refreshToken = Cookies.get('refresh_token')
     if (!refreshToken) {
       await logout()
@@ -118,6 +128,7 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   function isAccessTokenValid(): boolean {
+    if (skipNetwork) return !!Cookies.get('access_token')
     const accessToken = Cookies.get('access_token')
     if (!accessToken) return false
 
@@ -131,8 +142,13 @@ function ClientProvider({children}: ClientProviderProps) {
   }
 
 
+  function isAdmin(): boolean {
+    return !!user && user.roles.includes('ROLE_ADMIN')
+  }
+
+
   return (
-    <ClientContext.Provider value={{user, login, register, logout, isLoggedIn}}>
+    <ClientContext.Provider value={{user, login, register, logout, isLoggedIn, isAdmin}}>
       {children}
     </ClientContext.Provider>
   );
