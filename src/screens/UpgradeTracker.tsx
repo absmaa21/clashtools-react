@@ -33,7 +33,9 @@ const UpgradeTracker = () => {
         onChange={(_e, v: number) => setActiveTab(v)}
         variant={'scrollable'} style={{marginBottom: 32}}
       >
-        {tabCategories.sort((a, b) => a.localeCompare(b)).map(c => <Tab key={c} label={snakeToHumanReadable(c)}/>)}
+        {tabCategories
+          .sort((a, b) => a.localeCompare(b))
+          .map(c => <Tab key={c} label={snakeToHumanReadable(c)}/>)}
       </Tabs>
 
       <Box sx={{px: {xs: 0, lg: 4} }}>

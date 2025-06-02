@@ -19,25 +19,52 @@ function SettingsScreen() {
             Accessibility
           </Typography>
 
-          <FormControlLabel
-            control={
-              <Switch
-                checked={Settings.reducedMotion}
-                onChange={e => Settings.setReducedMotion(e.target.checked)}
-                color="primary"
-              />
-            }
-            label="Reduced Motion"
-            sx={{ mt: 1 }}
+          <ToggleSetting
+            label="Reduced Motion" desc="Reduce animations and motion effects for better accessibility."
+            checked={Settings.reducedMotion} toggle={Settings.setReducedMotion}
           />
 
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Reduce animations and motion effects for better accessibility.
+          <Typography variant="h6" gutterBottom mt={4}>
+            Layout
           </Typography>
+
+          <ToggleSetting
+            label="Show Finished Categories" desc="Shows Categories even if they are already completed."
+            checked={Settings.showFinishedCategories} toggle={Settings.toggleShowFinishedCategories}
+          />
         </Box>
       </Paper>
     </Container>
   );
+}
+
+interface ToggleSettingProps {
+  label: string,
+  desc: string,
+  checked: boolean,
+  toggle: (newValue: boolean) => void,
+}
+
+function ToggleSetting({label, desc, checked, toggle}: ToggleSettingProps) {
+  return (
+    <>
+      <FormControlLabel
+        control={
+          <Switch
+            checked={checked}
+            onChange={e => toggle(e.target.checked)}
+            color="primary"
+          />
+        }
+        label={label}
+        sx={{ mt: 1 }}
+      />
+
+      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+        {desc}
+      </Typography>
+    </>
+  )
 }
 
 export default SettingsScreen;

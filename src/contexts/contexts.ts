@@ -28,6 +28,8 @@ export const ClientContext = createContext<ClientContextProps | undefined>(undef
 export interface SettingsContextProps {
   reducedMotion: boolean,
   setReducedMotion: React.Dispatch<SetStateAction<boolean>>,
+  showFinishedCategories: boolean,
+  toggleShowFinishedCategories: () => void,
 }
 export const SettingsContext = createContext<SettingsContextProps | undefined>(undefined)
 
