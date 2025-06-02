@@ -7,10 +7,15 @@ import {useNavigate} from "react-router";
 interface Page {
   title: string,
   path: string,
+  subPages?: {
+    title: string,
+    path: string,
+  }[],
 }
 const pages: Page[] = [
   {title: 'Dashboard', path: '/'},
   {title: 'Upgrade Tracker', path: '/tracker'},
+  {title: 'Admin', path: '/admin'},
 ];
 
 function Header() {

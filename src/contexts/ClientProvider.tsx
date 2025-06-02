@@ -50,7 +50,7 @@ function ClientProvider({children}: ClientProviderProps) {
 
   async function login(username: string, password: string): Promise<ErrorResponse | string | null> {
     try {
-      const response = await axios.post<Tokens>(`${base_url}/api/auth/login`, {username, password})
+      const response = await axios.post<Tokens>(`${base_url}/api/auth/login`, {username, password}, {withCredentials: true})
       setTokens(response.data.accessToken, response.data.refreshToken)
       notify.show('Login successful.', {autoHideDuration: 1000, severity: 'success'})
       return null

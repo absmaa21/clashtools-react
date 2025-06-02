@@ -5,9 +5,11 @@ import {skipNetwork} from "../env.ts";
 import {isAxiosError} from "axios";
 import {useNotifications} from "@toolpad/core";
 import {demoAccountEntities} from "../services/demoData.ts";
+import useClient from "../hooks/useClient.ts";
 
 function AccountEntityProvider({children}: {children: ReactNode}) {
 
+  const Client = useClient()
   const notify = useNotifications()
   const [accountEntities, setAccountEntities] = useState<AccountEntity[]>([])
 
@@ -27,7 +29,7 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
       return null
     }
     getAccountUpgrades().then()
-  }, [accountEntities, notify]);
+  }, [accountEntities, notify, Client.user]);
 
 
   async function startUpgrade(id: string): Promise<ErrorResponse | string | null> {

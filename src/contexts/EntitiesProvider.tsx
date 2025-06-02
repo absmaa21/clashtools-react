@@ -2,8 +2,10 @@ import {ReactNode, useEffect, useState} from "react";
 import {EntitiesContext} from "./contexts.ts";
 import {demoEntities} from "../services/demoData.ts";
 import {useNotifications} from "@toolpad/core";
-import {skipNetwork} from "../env.ts";
-import {isAxiosError} from "axios";
+import {skipNetwork, base_url} from "../env.ts";
+import axios, {isAxiosError} from "axios";
+import Cookies from "js-cookie";
+import useClient from "../hooks/useClient.ts";
 
 interface EntitiesProviderProps {
   children: ReactNode,
@@ -11,25 +13,34 @@ interface EntitiesProviderProps {
 
 function EntitiesProvider({children}: EntitiesProviderProps) {
 
+  const Client = useClient()
   const notify = useNotifications()
   const [entities, setEntities] = useState<Entity[]>([])
+  const [refreshEntities, setRefreshEntities] = useState<boolean>(false)
 
   useEffect(() => {
     async function getEntities() {
+      if (!refreshEntities) return
       if (skipNetwork) {
         setEntities(p => p.length > 0 ? p : demoEntities)
         return
       }
 
       try {
-        console.warn('No fetch for getting all entities')
+        const response = await axios.get<Entity[]>(`${base_url}/api/base-entities`)
+        if (response.status === 200) setEntities(response.data)
+        else console.log('GetAllEntities: Something went wrong. ', response)
       } catch (e) {
-        if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Get Entities: AxiosError')
+        if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response) : 'Get Entities: AxiosError')
         notify.show(`Something went wrong getting entities.`, {autoHideDuration: 2000, severity: 'error'})
       }
     }
-    getEntities().then()
-  }, [entities, notify]);
+    getEntities().then(() => setRefreshEntities(false))
+  }, [refreshEntities, notify, Client.user]);
+
+  useEffect(() => {
+    setRefreshEntities(true)
+  }, [entities]);
 
 
   async function addEntity(newEntity: Entity) {
@@ -40,8 +51,11 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
 
     try {
-      console.warn('No post for adding a new entity')
-      //notify.show(`Successfully added ${newEntity.name}`, {autoHideDuration: 1000, severity: 'success'})
+      const response = await axios.post<Entity>(`${base_url}/api/base-entities`, newEntity)
+      if (response.status === 200) {
+        setEntities(p => [...p, response.data])
+        notify.show(`Successfully added ${newEntity.name}`, {autoHideDuration: 1000, severity: 'success'})
+      }
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Add Entity: AxiosError')
       notify.show(`Something went wrong adding ${newEntity.name}.`, {autoHideDuration: 2000, severity: 'error'})
