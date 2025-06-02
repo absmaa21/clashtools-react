@@ -61,22 +61,6 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
   }
 
-  /*
-  function patchEntity<T extends keyof Entity>(id: string, key: T, value: Entity[T]) {
-    const oldEntity = entities.find(e => e.id === id)
-
-    if (!oldEntity) {
-      notify.show(`Entity with id ${id} not found!`, {autoHideDuration: 2000, severity: 'error'})
-      return
-    }
-
-    oldEntity[key] = value;
-    setEntities(p => [...p.filter(e => e.id !== id), oldEntity])
-
-    notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
-  }
-   */
-
   async function updateEntity(newEntity: Entity) {
     const oldEntity = entities.find(e => e.id === newEntity.id)
     if (!oldEntity) {
@@ -84,15 +68,16 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       return
     }
 
-    const newEntities: Entity[] = [...entities.filter(e => e.id !== newEntity.id), newEntity]
     if (skipNetwork) {
-      setEntities(newEntities)
+      setEntities(p => [...p.filter(e => e.id !== newEntity.id), newEntity])
       return
     }
 
     try {
-      console.warn('No put for updating entities')
-      //notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      const response = await axios.put<Entity>(`${base_url}/api/base-entities/${oldEntity.id}`, newEntity)
+      if (response.status !== 200) return
+      setEntities(p => [...p.filter(e => e.id !== newEntity.id), response.data])
+      notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Update Entity: AxiosError')
       notify.show(`Something went wrong updating ${newEntity.name}.`, {autoHideDuration: 2000, severity: 'error'})
@@ -113,8 +98,12 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
 
     try {
-      console.warn('No delete for removing entities')
-      //notify.show(`Successfully removed ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      const response = await axios.delete(`${base_url}/api/base-entities/${entity.id}`)
+      if (response.status !== 204) {
+        notify.show(`Error while deleting Entity: ${JSON.stringify(response.data)}`)
+        return
+      }
+      notify.show(`Successfully deleted ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Remove Entity: AxiosError')
       notify.show(`Something went wrong updating ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
