@@ -1,4 +1,6 @@
 import {Box, LinearProgress, TableCell, Typography} from "@mui/material";
+import {secondsToString} from "../../utils/StringMethods.ts";
+import {getResourceByType} from "../../utils/CocAssets.ts";
 
 interface Props {
   accountEntity: AccountEntity,
@@ -30,10 +32,31 @@ function UpgradeCol({accountEntity}: Props) {
 
   return (
     <TableCell sx={{ width: {sm: '33%', md: 200}, p: 0, position: 'relative' }}>
-      <Box sx={{display: 'flex', justifyContent: 'center', gap: 2}}>
-        {accountEntity.upgradeStart
-          ? `${new Date(accountEntity.upgradeStart + displayLevel.upgradeTime).toLocaleString()}`
-          : `${displayLevel.upgradeTime}`}
+
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
+        {accountEntity.upgradeStart ? (
+          new Date(accountEntity.upgradeStart + displayLevel.upgradeTime).toLocaleString()
+        ) : (
+          <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5, py: 0.5 }}>
+            <img
+              src={getResourceByType(displayLevel.resource)}
+              alt="cost icon"
+              style={{
+                width: 16,
+                height: 16,
+                objectFit: 'contain',
+                marginRight: 6,
+                filter: 'drop-shadow(0 0 2px rgba(0,0,0,0.2))',
+              }}
+            />
+            <Typography component="span" fontSize={'small'} fontWeight={'bold'}>
+              {displayLevel.cost}
+            </Typography>
+            <Typography component="span" fontSize={'small'} ml={2}>
+              {secondsToString(displayLevel.upgradeTime)}
+            </Typography>
+          </Box>
+        )}
       </Box>
 
       <LinearProgress

@@ -73,53 +73,6 @@ const UpgradeTracker = () => {
   );
 };
 
-/*
-<Typography variant={'body2'}>All upgrades done!</Typography>
-
-{entities.filter(e => Category[e.category] === tabCategories[activeTab] && accountEntities.find(a => a.entity.id === e.id)).map(ae => {
-                const availableAccountEntities = accountEntities.filter(a => a.entity.id === ae.id)
-                return (
-                  <>
-                    {availableAccountEntities.map((a, i) => {
-                      const nextLevel: EntityLevel | undefined = entities
-                        .flatMap(e => e.levels) // get all levels from all entities
-                        .filter(l => l.level > a.level) // only higher levels
-                        .sort((a, b) => a.level - b.level)[0]; // pick the smallest higher level
-
-                      if (!nextLevel) return (
-                        <Typography variant={'body2'}>All upgrades finished!</Typography>
-                      )
-
-                      return (
-                        <TableRow key={`${a.id}-${nextLevel.id}`}>
-                          {i == 0 && (
-                            <TableCell
-                              rowSpan={availableAccountEntities.length}
-                              sx={{ borderRight: "solid 1px #0002", width: {xs: '25%', md: '20%'} }}
-                            >
-                              <Box sx={{
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: 1
-                              }}>
-                                <img src={nextLevel.imgPath} alt={`${a.id}-${nextLevel.id}-img`} height={64}/>
-                                <Typography variant={'body2'}>{a.entity.name}</Typography>
-                              </Box>
-                            </TableCell>
-                          )}
-                          <LevelCol entity={a.entity} entityLevel={nextLevel}/>
-                          <UpgradeCol entityLevel={nextLevel}/>
-                        </TableRow>
-                      )
-                    })}
-                  </>
-                )
-              })}
- */
-
-
 const UpgradeTableHeader = ({categoryName}: {categoryName: string}) => {
   return (
     <TableHead sx={{bgcolor: '#1565c0'}}>
@@ -131,27 +84,5 @@ const UpgradeTableHeader = ({categoryName}: {categoryName: string}) => {
     </TableHead>
   )
 }
-
-/*
-{upgrades.map((upgrade) => (
-              <>
-                <TableRow key={upgrade.id}>
-                  <TableCell>{upgrade.name}</TableCell>
-                  <TableCell>{upgrade.level}</TableCell>
-                  <TableCell>{upgrade.duration}</TableCell>
-                </TableRow>
-                <TableRow>
-                 <TableCell colSpan={3} sx={{ padding: 0, borderBottom: 'none' }}>
-                   <LinearProgress
-                     variant="determinate"
-                     value={upgrade.progress}
-                     color={upgrade.completed ? 'success' : 'secondary'}
-                     sx={{ height: 2 }}
-                   />
-                 </TableCell>
-                </TableRow>
-              </>
-            ))}
- */
 
 export default UpgradeTracker;
