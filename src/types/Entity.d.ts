@@ -7,4 +7,5 @@ interface Entity {
   category: Category,
   maxLevel: number,
   levels: EntityLevel[],
+  maxAllowed?: number,
 }

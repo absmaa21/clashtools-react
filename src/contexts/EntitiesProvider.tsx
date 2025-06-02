@@ -4,7 +4,6 @@ import {demoEntities} from "../services/demoData.ts";
 import {useNotifications} from "@toolpad/core";
 import {skipNetwork, base_url} from "../env.ts";
 import axios, {isAxiosError} from "axios";
-import Cookies from "js-cookie";
 import useClient from "../hooks/useClient.ts";
 
 interface EntitiesProviderProps {

@@ -143,7 +143,7 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   function isAdmin(): boolean {
-    return !!user && user.roles.includes('ROLE_ADMIN')
+    return !!user && user.roles.includes('ROLE_ADMIN') && isAccessTokenValid()
   }
 
 
