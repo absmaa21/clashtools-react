@@ -1,6 +1,6 @@
 import {ReactNode, useEffect, useState} from "react";
 import { ClientContext } from "./contexts";
-import {base_url} from "../env.ts";
+import {base_url, skipNetwork} from "../env.ts";
 import axios from "axios";
 import {useNotifications} from "@toolpad/core";
 import {ErrorResponse} from "../types/ApiResponse.ts";
@@ -49,6 +49,16 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   async function login(username: string, password: string): Promise<ErrorResponse | string | null> {
+    if (skipNetwork) {
+      Cookies.set('access_token', 'asdasd')
+      Cookies.set('refresh_token', 'cvbcvb')
+      setUser({
+        username: username,
+        roles: ['ROLE_ADMIN'],
+      })
+      return null
+    }
+
     try {
       const response = await axios.post<Tokens>(`${base_url}/api/auth/login`, {username, password}, {withCredentials: true})
       setTokens(response.data.accessToken, response.data.refreshToken)
