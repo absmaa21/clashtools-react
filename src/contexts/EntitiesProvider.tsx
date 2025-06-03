@@ -33,7 +33,6 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
           response.data.forEach(e => newEntities.push({
             ...e,
             category: Category[e.category],
-            levels: [],
           }))
           setEntities(newEntities)
         }
@@ -118,6 +117,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
   }
 
+
   async function addLevel(entity: Entity, newLevel: EntityLevel) {
     if (entity.levels.find(l => l.level === newLevel.level)) {
       notify.show(`Level ${newLevel.level} already exists!`, {autoHideDuration: 2000, severity: 'error'})
@@ -132,8 +132,16 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
 
     try {
-      console.warn('No post for adding a new entity level')
-      //notify.show(`Successfully added Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      const response = await axios.get<EntityLevel[]>(`${base_url}/api/base-entity-levels`)
+      if (response.status % 200 < 100) {
+        notify.show(`Successfully added Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+        /*
+        entity.levels.push(newLevel)
+        const newEntities: Entity[] = [...entities.filter(e => e.id !== entity.id), entity]
+        setEntities(newEntities)
+         */
+        setRefreshEntities(true)
+      }
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Add EntityLevel: AxiosError')
       notify.show(`Error while adding Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
