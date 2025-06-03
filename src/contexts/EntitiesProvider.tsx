@@ -2,9 +2,10 @@ import {ReactNode, useEffect, useState} from "react";
 import {EntitiesContext} from "./contexts.ts";
 import {demoEntities} from "../services/demoData.ts";
 import {useNotifications} from "@toolpad/core";
-import {skipNetwork, base_url} from "../env.ts";
+import {base_url, skipNetwork} from "../env.ts";
 import axios, {isAxiosError} from "axios";
 import useClient from "../hooks/useClient.ts";
+import { Category } from "../enums/Category.ts";
 
 interface EntitiesProviderProps {
   children: ReactNode,
@@ -15,7 +16,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
   const Client = useClient()
   const notify = useNotifications()
   const [entities, setEntities] = useState<Entity[]>([])
-  const [refreshEntities, setRefreshEntities] = useState<boolean>(false)
+  const [refreshEntities, setRefreshEntities] = useState<boolean>(true)
 
   useEffect(() => {
     async function getEntities() {
@@ -27,7 +28,15 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
 
       try {
         const response = await axios.get<Entity[]>(`${base_url}/api/base-entities`)
-        if (response.status === 200) setEntities(response.data)
+        if (response.status === 200) {
+          const newEntities: Entity[] = []
+          response.data.forEach(e => newEntities.push({
+            ...e,
+            category: Category[e.category],
+            levels: [],
+          }))
+          setEntities(newEntities)
+        }
         else console.log('GetAllEntities: Something went wrong. ', response)
       } catch (e) {
         if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response) : 'Get Entities: AxiosError')
@@ -36,10 +45,6 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
     getEntities().then(() => setRefreshEntities(false))
   }, [refreshEntities, notify, Client.user]);
-
-  useEffect(() => {
-    setRefreshEntities(true)
-  }, [entities]);
 
 
   async function addEntity(newEntity: Entity) {
@@ -53,6 +58,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       const response = await axios.post<Entity>(`${base_url}/api/base-entities`, newEntity)
       if (response.status === 200) {
         setEntities(p => [...p, response.data])
+        setRefreshEntities(true)
         notify.show(`Successfully added ${newEntity.name}`, {autoHideDuration: 1000, severity: 'success'})
       }
     } catch (e) {
@@ -77,6 +83,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       const response = await axios.put<Entity>(`${base_url}/api/base-entities/${oldEntity.id}`, newEntity)
       if (response.status !== 200) return
       setEntities(p => [...p.filter(e => e.id !== newEntity.id), response.data])
+      setRefreshEntities(true)
       notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Update Entity: AxiosError')
@@ -103,6 +110,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
         notify.show(`Error while deleting Entity: ${JSON.stringify(response.data)}`)
         return
       }
+      setRefreshEntities(true)
       notify.show(`Successfully deleted ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Remove Entity: AxiosError')

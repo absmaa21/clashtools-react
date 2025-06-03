@@ -5,7 +5,6 @@ interface Entity {
   id: string,
   name: string,
   category: Category,
-  maxLevel: number,
   levels: EntityLevel[],
   maxAllowed?: number,
 }

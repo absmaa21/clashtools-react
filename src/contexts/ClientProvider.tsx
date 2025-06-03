@@ -143,6 +143,7 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   function isAdmin(): boolean {
+    if (skipNetwork) return true
     return !!user && user.roles.includes('ROLE_ADMIN') && isAccessTokenValid()
   }
 

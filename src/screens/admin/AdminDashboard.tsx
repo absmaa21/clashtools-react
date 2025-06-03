@@ -72,7 +72,6 @@ function AdminDashboard() {
             id: '',
             name: '',
             category: activeTab,
-            maxLevel: 4,
             levels: [],
           })}>
             Add new Entity
