@@ -2,7 +2,7 @@
  * Base type from which most objects extend.
  */
 interface Entity {
-  id: string,
+  id: number,
   name: string,
   category: Category,
   levels: EntityLevel[],

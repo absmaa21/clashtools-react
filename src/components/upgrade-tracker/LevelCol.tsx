@@ -13,27 +13,15 @@ interface Props {
 
 function LevelCol({accountEntity}: Props) {
 
-  const {startUpgrade, editUpgrade, cancelUpgrade} = useAccountEntity()
+  const {startUpgrade, editUpgrade} = useAccountEntity()
   const [editDialog, setEditDialog] = useState<boolean>(false)
   const [finishDialog, setFinishDialog] = useState<boolean>(false)
-  const displayLevel: EntityLevel = accountEntity.entity.levels
-      .filter(ae => ae.level > accountEntity.level)
-      .sort((a, b) => a.level - b.level)[0]
-    ?? accountEntity.entity.levels.find(ae => ae.level === accountEntity.level)
+  const displayLevel: EntityLevel = accountEntity.entity.levels[accountEntity.level]
+    ?? accountEntity.entity.levels[accountEntity.entity.levels.length-1]
 
   const handleStartUpgradePress = () => {
     if (accountEntity.upgradeStart) setEditDialog(true)
     else startUpgrade(accountEntity.id).then()
-  }
-
-  const handleEditFinish = (result: 'cancel' | 'finish') => {
-    if (result === 'finish') {
-      accountEntity.upgradeStart = Date.now() - displayLevel.upgradeTime
-      editUpgrade(accountEntity).then()
-    } else {
-      cancelUpgrade(accountEntity.id).then()
-    }
-    setEditDialog(false)
   }
 
   return (
@@ -47,7 +35,7 @@ function LevelCol({accountEntity}: Props) {
       <TableCell sx={{padding: 0, width: '10%'}}>
         <Box sx={{display: 'flex', justifyContent: 'center', gap: 2}}>
           <Typography variant={'body2'}>
-            {accountEntity.level} / {accountEntity.entity.maxLevel}
+            {accountEntity.level} / {accountEntity.entity.levels.length}
           </Typography>
         </Box>
       </TableCell>
@@ -94,7 +82,7 @@ function LevelCol({accountEntity}: Props) {
       />
 
       <Modal open={editDialog} onClose={() => setEditDialog(false)} sx={{placeSelf: 'center'}}>
-        <EditUpgrade accountEntity={accountEntity} onFinish={handleEditFinish}/>
+        <EditUpgrade accountEntity={accountEntity} onClose={() => setEditDialog(false)}/>
       </Modal>
     </>
   );

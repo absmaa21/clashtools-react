@@ -1,6 +1,8 @@
 import {Box, LinearProgress, TableCell, Typography} from "@mui/material";
 import {secondsToString} from "../../utils/StringMethods.ts";
 import {getResourceByType} from "../../utils/CocAssets.ts";
+import {useEffect, useState} from "react";
+import useAccountEntity from "../../hooks/useAccountEntity.ts";
 
 interface Props {
   accountEntity: AccountEntity,
@@ -8,6 +10,8 @@ interface Props {
 
 function UpgradeCol({accountEntity}: Props) {
 
+  const {checkForFinish} = useAccountEntity()
+  const [progressInPercent, setProgressInPercent] = useState<number>(0)
   const displayLevel: EntityLevel | undefined = accountEntity.entity.levels
     .filter(ae => ae.level > accountEntity.level)
     .sort((a, b) => a.level - b.level)[0]
@@ -16,11 +20,19 @@ function UpgradeCol({accountEntity}: Props) {
     if (!accountEntity.upgradeStart || !displayLevel) return 0
 
     const now = Date.now()
-    const endTime = accountEntity.upgradeStart + displayLevel.upgradeTime
+    const endTime = accountEntity.upgradeStart + displayLevel.upgradeTime * 1000
     const totalDuration = endTime - accountEntity.upgradeStart
     const elapsed = now - accountEntity.upgradeStart
     return Math.max(0, Math.min(100, elapsed / totalDuration))
   }
+
+  useEffect(() => {
+    const secInterval = setInterval(async () => {
+      setProgressInPercent(getProgressInPercent())
+      await checkForFinish(accountEntity.id)
+    }, 1000)
+    return () => clearInterval(secInterval)
+  }, [accountEntity.upgradeStart]);
 
   if (!displayLevel) return (
     <TableCell sx={{ width: {sm: '33%', md: 200}, p: 0, position: 'relative' }}>
@@ -35,7 +47,7 @@ function UpgradeCol({accountEntity}: Props) {
 
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1 }}>
         {accountEntity.upgradeStart ? (
-          new Date(accountEntity.upgradeStart + displayLevel.upgradeTime).toLocaleString()
+          new Date(accountEntity.upgradeStart + displayLevel.upgradeTime * 1000).toLocaleString()
         ) : (
           <Box sx={{ display: 'flex', alignItems: 'center', px: 1.5, py: 0.5 }}>
             <img
@@ -61,7 +73,7 @@ function UpgradeCol({accountEntity}: Props) {
 
       <LinearProgress
         variant="determinate"
-        value={getProgressInPercent()}
+        value={progressInPercent * 100}
         color={'primary'}
         sx={{
           position: 'absolute',

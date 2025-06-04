@@ -6,7 +6,7 @@ export interface EntitiesContextProps {
   entities: Entity[],
   addEntity: (newEntity: Entity) => Promise<void>,
   updateEntity: (newEntity: Entity) => Promise<void>,
-  removeEntity: (id: string) => Promise<void>,
+  removeEntity: (id: number) => Promise<void>,
   addLevel: (entity: Entity, newLevel: EntityLevel) => Promise<void>,
   editLevel: (entity: Entity, updatedLevel: EntityLevel) => Promise<void>,
   removeLevel: (entity: Entity, entityLevel: EntityLevel) => Promise<void>,
@@ -36,8 +36,9 @@ export const SettingsContext = createContext<SettingsContextProps | undefined>(u
 
 export interface AccountEntityProps {
   accountEntities: AccountEntity[],
-  startUpgrade: (id: string) => Promise<ErrorResponse | string | null>,
+  startUpgrade: (id: number) => Promise<ErrorResponse | string | null>,
   editUpgrade: (updatedUpgrade: AccountEntity) => Promise<ErrorResponse | string | null>
-  cancelUpgrade: (id: string) => Promise<ErrorResponse | string | null>,
+  cancelUpgrade: (id: number) => Promise<ErrorResponse | string | null>,
+  checkForFinish: (id: number) => Promise<boolean>,
 }
 export const AccountEntityContext = createContext<AccountEntityProps | undefined>(undefined)

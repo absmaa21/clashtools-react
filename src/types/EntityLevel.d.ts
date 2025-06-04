@@ -2,7 +2,7 @@
  * Base type for every level of an entity
  */
 interface EntityLevel {
-  id: string,
+  id: number,
   level: number,
   stats: EntityStat[],
   cost: number,

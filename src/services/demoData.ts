@@ -3,13 +3,12 @@ import {ResourceType} from "../enums/ResourceType.ts";
 
 export const demoEntities: Entity[] = [
   {
-    id: "hero_king",
+    id: 1,
     name: "Barbarian King",
     category: Category.HERO,
-    maxLevel: 100,
     levels: [
       {
-        id: "bk_lvl_1",
+        id: 454,
         level: 1,
         stats: [
           { key: "Hitpoints", value: 1300 },
@@ -23,7 +22,7 @@ export const demoEntities: Entity[] = [
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/2/26/Avatar_Hero_Barbarian_King.png',
       },
       {
-        id: "bk_lvl_5",
+        id: 1543654362,
         level: 5,
         stats: [
           { key: "Hitpoints", value: 1550 },
@@ -39,13 +38,12 @@ export const demoEntities: Entity[] = [
     ],
   },
   {
-    id: "troop_archer",
+    id: 28452,
     name: "Archer",
     category: Category.TROOP,
-    maxLevel: 18,
     levels: [
       {
-        id: "archer_lvl_1",
+        id: 30704354,
         level: 1,
         stats: [
           { key: "Hitpoints", value: 20 },
@@ -58,7 +56,7 @@ export const demoEntities: Entity[] = [
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/e/ee/Archer1.png',
       },
       {
-        id: "archer_lvl_3",
+        id: 13834,
         level: 3,
         stats: [
           { key: "Hitpoints", value: 28 },
@@ -73,13 +71,12 @@ export const demoEntities: Entity[] = [
     ],
   },
   {
-    id: "defense_archer_tower",
+    id: 1468,
     name: "Archer Tower",
     category: Category.DEFENSE,
-    maxLevel: 21,
     levels: [
       {
-        id: "archertower_lvl_1",
+        id: 58364,
         level: 1,
         stats: [
           { key: "Hitpoints", value: 380 },
@@ -92,33 +89,32 @@ export const demoEntities: Entity[] = [
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/6/6e/Archer_Tower1.png',
       },
       {
-        id: 'archertower_lvl_5',
+        id: 4828,
         level: 2,
         stats: [],
         resource: ResourceType.GOLD,
         cost: 70_000,
-        upgradeTime: (60 + 30) * 60,
+        upgradeTime: 60,
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/e/e8/Archer_Tower5.png',
       },
       {
-        id: 'archertower_lvl_21',
+        id: 974,
         level: 3,
         stats: [],
         resource: ResourceType.GOLD,
         cost: 4_000_000,
-        upgradeTime: (3 * 24) * 60 * 60,
+        upgradeTime: 60 * 60,
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/f/fa/Archer_Tower21.png',
       },
     ],
   },
   {
-    id: 'defense_cannon',
+    id: 4574,
     name: 'Cannon',
     category: Category.DEFENSE,
-    maxLevel: 21,
     levels: [
       {
-        id: 'cannon_lvl_1',
+        id: 24572,
         level: 1,
         stats: [],
         resource: ResourceType.GOLD,
@@ -127,8 +123,8 @@ export const demoEntities: Entity[] = [
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/a/a1/Cannon1.png',
       },
       {
-        id: 'cannon_lvl_20',
-        level: 20,
+        id: 2457,
+        level: 2, // 20
         stats: [],
         resource: ResourceType.GOLD,
         cost: 2_600_000,
@@ -136,8 +132,8 @@ export const demoEntities: Entity[] = [
         imgPath: 'https://static.wikia.nocookie.net/clashofclans/images/7/71/Cannon20B.png',
       },
       {
-        id: 'cannon_lvl_21',
-        level: 21,
+        id: 245756,
+        level: 3, // 21
         stats: [],
         resource: ResourceType.GOLD,
         cost: 3_000_000,
@@ -152,49 +148,49 @@ export const demoEntities: Entity[] = [
 export const demoAccountEntities: AccountEntity[] = [
   // ARCHER TOWERS
   {
-    id: 'archer_tower_1',
+    id: 64,
     entity: demoEntities[2],
     level: 0,
   },
   {
-    id: 'archer_tower_2',
+    id: 523435277,
     entity: demoEntities[2],
     level: 1,
-    upgradeStart: Date.now() - 7987,
+    upgradeStart: Date.now() - (demoEntities[2].levels[1].upgradeTime / 1.5) * 1000,
   },
   {
-    id: 'archer_tower_3',
+    id: 452683,
     entity: demoEntities[2],
     level: 2,
-    upgradeStart: Date.now() - 4548251,
+    upgradeStart: Date.now() - (demoEntities[2].levels[2].upgradeTime / 2) * 1000,
   },
   {
-    id: 'archer_tower_4',
+    id: 98765345,
     entity: demoEntities[2],
     level: 3,
   },
 
   // CANNONS
   {
-    id: 'cannon_1',
+    id: 563473,
     entity: demoEntities[3],
     level: 0,
   },
   {
-    id: 'cannon_2',
+    id: 87654345,
     entity: demoEntities[3],
     level: 20,
-    upgradeStart: Date.now() - 4345,
+    upgradeStart: Date.now() - (demoEntities[3].levels[2].upgradeTime / 1.7) * 1000,
   },
   {
-    id: 'cannon_3',
+    id: 574383,
     entity: demoEntities[3],
     level: 21,
   },
 
   // ARCHER
   {
-    id: 'archer',
+    id: 5754,
     entity: demoEntities[1],
     level: 0,
   },

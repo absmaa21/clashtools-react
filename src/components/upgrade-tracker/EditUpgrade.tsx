@@ -14,14 +14,16 @@ import {ResourceType} from "../../enums/ResourceType.ts";
 import { DoDisturb } from "@mui/icons-material";
 import CheckIcon from "@mui/icons-material/Check";
 import ConfirmationDialog from "../ConfirmationDialog.tsx";
+import useAccountEntity from "../../hooks/useAccountEntity.ts";
 
 interface Props {
   accountEntity: AccountEntity,
-  onFinish: (result: 'cancel' | 'finish') => void,
+  onClose: () => void,
 }
 
-function EditUpgrade({accountEntity, onFinish}: Props) {
+function EditUpgrade({accountEntity, onClose}: Props) {
 
+  const {editUpgrade, cancelUpgrade} = useAccountEntity()
   const [totalSeconds, setTotalSeconds] = useState<number>((Date.now() - accountEntity.upgradeStart!) / 1000)
   const [cancelDialog, setCancelDialog] = useState<boolean>(false)
 
@@ -119,7 +121,12 @@ function EditUpgrade({accountEntity, onFinish}: Props) {
             <Button
               variant={'contained'}
               size={'small'}
-              onClick={() => onFinish('finish')}
+              onClick={() => {
+                editUpgrade({
+                  ...accountEntity,
+                  upgradeStart: Date.now() - totalSeconds * 1000,
+                }).then(() => onClose())
+              }}
               sx={{minWidth: 0, width: 28, aspectRatio: '1'}}
               color={'success'}
             >
@@ -132,7 +139,7 @@ function EditUpgrade({accountEntity, onFinish}: Props) {
       <ConfirmationDialog
         open={cancelDialog}
         onClose={accepted => {
-          if (accepted) onFinish('cancel')
+          if (accepted) cancelUpgrade(accountEntity.id).then(() => onClose())
           setCancelDialog(false)
         }}
         title={`Cancel ${accountEntity.entity.name} upgrade?`}

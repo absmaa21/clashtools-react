@@ -32,7 +32,7 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
   }, [accountEntities, notify, Client.user]);
 
 
-  async function startUpgrade(id: string): Promise<ErrorResponse | string | null> {
+  async function startUpgrade(id: number): Promise<ErrorResponse | string | null> {
     const foundEntity = accountEntities.find(a => a.id === id)
     if (!foundEntity) return `Id '${id}' not found!`
 
@@ -54,6 +54,8 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
 
   async function editUpgrade(updatedUpgrade: AccountEntity): Promise<ErrorResponse | string | null> {
     if (!accountEntities.find(a => a.id === updatedUpgrade.id)) return `Id '${updatedUpgrade.id}' not found!`
+    if (await checkForFinish(updatedUpgrade.id)) return null
+
     if (skipNetwork) {
       setAccountEntities(p => [...p.filter(a => a.id !== updatedUpgrade.id), updatedUpgrade])
       return null
@@ -69,7 +71,7 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
   }
 
 
-  async function cancelUpgrade(id: string): Promise<ErrorResponse | string | null> {
+  async function cancelUpgrade(id: number): Promise<ErrorResponse | string | null> {
     const foundEntity = accountEntities.find(a => a.id === id)
     if (!foundEntity) return `Id '${id}' not found!`
 
@@ -89,8 +91,32 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
   }
 
 
+  async function checkForFinish(id: number): Promise<boolean> {
+    const accountEntity = accountEntities.find(ae => ae.id === id)
+    if (!accountEntity) {
+      console.warn('AccountEntity Id not found!')
+      return false
+    }
+
+    if (accountEntity.upgradeStart) {
+      const nextLevel: EntityLevel | undefined = accountEntity.entity.levels[accountEntity.level]
+      if (!nextLevel) return false
+      if (Date.now() >= accountEntity.upgradeStart + nextLevel.upgradeTime * 1000) {
+        setAccountEntities(p => [...p.filter(ae => ae.id !== id), {
+          ...accountEntity,
+          level: accountEntity.level + 1,
+          upgradeStart: undefined,
+        }])
+        return true
+      }
+    }
+
+    return false
+  }
+
+
   return (
-    <AccountEntityContext.Provider value={{ accountEntities, startUpgrade, editUpgrade, cancelUpgrade }}>
+    <AccountEntityContext.Provider value={{ accountEntities, startUpgrade, editUpgrade, cancelUpgrade, checkForFinish }}>
       {children}
     </AccountEntityContext.Provider>
   );

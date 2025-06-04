@@ -5,7 +5,7 @@ import {useNotifications} from "@toolpad/core";
 import {base_url, skipNetwork} from "../env.ts";
 import axios, {isAxiosError} from "axios";
 import useClient from "../hooks/useClient.ts";
-import { Category } from "../enums/Category.ts";
+import {BaseEntityLevelRequest} from "../types/DTOs/BaseEntityLevelRequest";
 
 interface EntitiesProviderProps {
   children: ReactNode,
@@ -27,13 +27,16 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       }
 
       try {
-        const response = await axios.get<Entity[]>(`${base_url}/api/base-entities`)
+        const response = await axios.get<BaseEntityResponse[]>(`${base_url}/api/base-entities`)
         if (response.status === 200) {
           const newEntities: Entity[] = []
+          console.log(response.data)
           response.data.forEach(e => newEntities.push({
             ...e,
-            category: Category[e.category],
+            category: e.categoryId,
+            levels: e.baseEntityLevels ?? [],
           }))
+          console.log(newEntities)
           setEntities(newEntities)
         }
         else console.log('GetAllEntities: Something went wrong. ', response)
@@ -90,7 +93,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
   }
 
-  async function removeEntity(id: string) {
+  async function removeEntity(id: number) {
     const entity = entities.find(e => e.id === id)
     if (!entity) {
       notify.show(`Entity with id ${id} not found!`, {autoHideDuration: 2000, severity: 'error'})
@@ -124,15 +127,24 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       return
     }
 
-    entity.levels.push(newLevel)
-    const newEntities: Entity[] = [...entities.filter(e => e.id !== entity.id), entity]
     if (skipNetwork) {
+      entity.levels.push(newLevel)
+      const newEntities: Entity[] = [...entities.filter(e => e.id !== entity.id), entity]
       setEntities(newEntities)
       return
     }
 
     try {
-      const response = await axios.get<EntityLevel[]>(`${base_url}/api/base-entity-levels`)
+      const body: BaseEntityLevelRequest = {
+        baseEntityId: entity.id,
+        levelId: newLevel.level,
+        attributeIds: [],
+        resourceType: newLevel.resource,
+        upgradeCost: newLevel.cost,
+        upgradeTime: newLevel.upgradeTime,
+        imgPath: newLevel.imgPath,
+      }
+      const response = await axios.post<EntityLevel[]>(`${base_url}/api/base-entity-levels`, body)
       if (response.status % 200 < 100) {
         notify.show(`Successfully added Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
         /*
