@@ -55,6 +55,7 @@ function EditUpgrade({accountEntity, onClose}: Props) {
   function onSecondsChange(newSeconds: number) {
     setTotalSeconds(dhmsToSeconds(days, hours, minutes, newSeconds));
   }
+  
 
   return (
     <Container maxWidth="sm">

@@ -72,7 +72,7 @@ function LevelCol({accountEntity}: Props) {
         open={finishDialog}
         onClose={accepted => {
           if (accepted) {
-            accountEntity.upgradeStart = Date.now() - displayLevel.upgradeTime
+            accountEntity.upgradeStart = Date.now() - displayLevel.upgradeTime * 1000
             editUpgrade(accountEntity).then()
           }
           setFinishDialog(false)
