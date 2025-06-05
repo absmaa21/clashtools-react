@@ -30,9 +30,9 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
         const response = await axios.get<BaseEntityResponse[]>(`${base_url}/api/base-entities`)
         if (response.status === 200) {
           const newEntities: Entity[] = []
-          console.log(response.data)
           response.data.forEach(e => newEntities.push({
-            ...e,
+            id: e.id,
+            name: e.name,
             category: e.categoryId,
             levels: e.baseEntityLevels ?? [],
           }))
@@ -137,7 +137,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     try {
       const body: BaseEntityLevelRequest = {
         baseEntityId: entity.id,
-        levelId: newLevel.level,
+        level: newLevel.level,
         attributeIds: [],
         resourceType: newLevel.resource,
         upgradeCost: newLevel.cost,
