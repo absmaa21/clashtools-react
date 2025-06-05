@@ -29,6 +29,7 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       try {
         const response = await axios.get<BaseEntityResponse[]>(`${base_url}/api/base-entities`)
         if (response.status === 200) {
+          console.log(response.data)
           const newEntities: Entity[] = []
           response.data.forEach(e => newEntities.push({
             id: e.id,
@@ -36,7 +37,6 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
             category: e.categoryId,
             levels: e.baseEntityLevels ?? [],
           }))
-          console.log(newEntities)
           setEntities(newEntities)
         }
         else console.log('GetAllEntities: Something went wrong. ', response)

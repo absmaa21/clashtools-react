@@ -44,7 +44,7 @@ function AdminDashboard() {
                 <ListItemButton
                   key={e.name + '-addnew'}
                   onClick={() => setEditEntityLevel({
-                    id: '',
+                    id: -1,
                     level: e.levels[e.levels.length - 1]?.level + 1 || 1,
                     stats: e.levels[e.levels.length - 1]?.stats || [],
                     cost: 0,
@@ -69,7 +69,7 @@ function AdminDashboard() {
 
         <ListItem key={'new-entity-item'}>
           <ListItemButton onClick={() => setEditEntity({
-            id: '',
+            id: -1,
             name: '',
             category: activeTab,
             levels: [],

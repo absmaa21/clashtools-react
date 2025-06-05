@@ -12,7 +12,7 @@ interface Props {
 
 function EntityForm({ initEntity, closeModal }: Props) {
 
-  const isNew: boolean = initEntity.id.length === 0
+  const isNew: boolean = initEntity.id <= 0
   const Entities = useEntities()
   const [entity, setEntity] = useState<Entity>(initEntity)
   const [deleteRequested, setDeleteRequested] = useState<boolean>(false)
@@ -63,9 +63,8 @@ function EntityForm({ initEntity, closeModal }: Props) {
 
         <div>
           <Button variant="contained" color="primary" sx={{ mr: 2 }} onClick={() => {
-            if (isNew) Entities.addEntity(entity)
-            else Entities.updateEntity(entity)
-            closeModal()
+            if (isNew) Entities.addEntity(entity).then(closeModal)
+            else Entities.updateEntity(entity).then(closeModal)
           }}>
             {isNew ? 'Add' : 'Save'}
           </Button>
@@ -78,8 +77,7 @@ function EntityForm({ initEntity, closeModal }: Props) {
         onClose={isAccepted => {
           setDeleteRequested(false)
           if (isAccepted) {
-            Entities.removeEntity(entity.id)
-            closeModal()
+            Entities.removeEntity(entity.id).then(closeModal)
           }
         }}
         title={`Delete ${entity.name}?`}

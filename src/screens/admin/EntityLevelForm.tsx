@@ -9,11 +9,12 @@ import {
   Divider,
   IconButton,
   Paper,
-  Grid, Container
+  Grid, Container, InputAdornment, Tooltip
 } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
+import {Add, ContentCut, Delete, Image} from '@mui/icons-material';
 import useEntities from "../../hooks/useEntities.ts";
 import ConfirmationDialog from "../../components/ConfirmationDialog.tsx";
+import {getResourceByType} from "../../utils/CocAssets.ts";
 
 interface Props {
   entity: Entity,
@@ -23,14 +24,22 @@ interface Props {
 
 function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
 
-  const isNew: boolean = initEntityLevel.id.length === 0
+  const isNew: boolean = initEntityLevel.id <= 0
   const Entities = useEntities()
   const [entityLevel, setEntityLevel] = useState<EntityLevel>(initEntityLevel)
   const [deleteRequested, setDeleteRequested] = useState<boolean>(false)
+  const [cutExtras, setCutExtras] = useState<boolean>(true)
 
   const handleChange = (field: keyof EntityLevel, value: string | number) => {
     setEntityLevel(prev => ({ ...prev, [field]: value }));
-  };
+  }
+
+  const handlePasteChange = (imgPath: string) => {
+    setEntityLevel(p => ({
+      ...p,
+      imgPath: imgPath.substring(0, imgPath.indexOf('.png')+4),
+    }))
+  }
 
   const handleStatChange = (index: number, field: 'key' | 'value', value: string | number) => {
     setEntityLevel(prev => {
@@ -100,6 +109,17 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
               label="Resource Type"
               value={entityLevel.resource}
               onChange={(e) => handleChange('resource', e.target.value)}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <img src={getResourceByType(entityLevel.resource)} alt={'resource-img'} style={{
+                        height: 24, objectFit: 'contain'
+                      }} />
+                    </InputAdornment>
+                  ),
+                },
+              }}
             >
               {Object.values(ResourceType).filter(t => typeof t !== 'string').map(type => (
                 <MenuItem key={ResourceType[type]} value={type}>
@@ -119,19 +139,40 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
             />
           </Grid>
 
-          <Grid size={1}>
-            <img
-              src={entityLevel.imgPath.length > 0 ? entityLevel.imgPath : undefined} alt={'Image Preview'}
-              style={{ height: 40 }}
-            />
-          </Grid>
-          <Grid size={11}>
+          <Grid size={12}>
             <TextField
               fullWidth
               label="Image Url"
               type="url"
               value={entityLevel.imgPath}
               onChange={e => handleChange('imgPath', e.target.value)}
+              onPaste={e => {
+                if (!cutExtras) return
+                e.preventDefault()
+                handlePasteChange(e.clipboardData.getData('text/plain'))
+              }}
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <img src={entityLevel.imgPath} alt={'resource-img'} style={{
+                        height: 32, objectFit: 'contain'
+                      }} />
+                    </InputAdornment>
+                  ),
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Tooltip title={cutExtras ? 'Remove wiki extras on paste' : 'Keep wiki extras on paste'}>
+                        <IconButton onClick={() => setCutExtras(!cutExtras)} style={{
+                          opacity: cutExtras ? 0.8 : 0.5
+                        }}>
+                          {cutExtras ? <ContentCut/> : <Image/>}
+                        </IconButton>
+                      </Tooltip>
+                    </InputAdornment>
+                  )
+                },
+              }}
             />
           </Grid>
         </Grid>
@@ -173,9 +214,8 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
 
           <div>
             <Button variant="contained" color="primary" sx={{ mr: 2 }} onClick={() => {
-              if (isNew) Entities.addLevel(entity, entityLevel)
-              else Entities.editLevel(entity, entityLevel)
-              closeModal()
+              if (isNew) Entities.addLevel(entity, entityLevel).then(closeModal)
+              else Entities.editLevel(entity, entityLevel).then(closeModal)
             }}>
               {isNew ? 'Add' : 'Save'}
             </Button>
@@ -189,8 +229,7 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
         onClose={isAccepted => {
           setDeleteRequested(false)
           if (isAccepted) {
-            Entities.removeLevel(entity, entityLevel)
-            closeModal()
+            Entities.removeLevel(entity, entityLevel).then(closeModal)
           }
         }}
         title={`Delete ${entity.name} Level ${entityLevel.level}?`}
