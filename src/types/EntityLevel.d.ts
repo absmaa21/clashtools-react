@@ -4,7 +4,6 @@
 interface EntityLevel {
   id: number,
   level: number,
-  stats: EntityStat[],
   cost: number,
   resource: ResourceType,
   upgradeTime: number,

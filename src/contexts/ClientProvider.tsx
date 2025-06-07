@@ -3,7 +3,7 @@ import { ClientContext } from "./contexts";
 import {base_url, skipNetwork} from "../env.ts";
 import axios from "axios";
 import {useNotifications} from "@toolpad/core";
-import {ErrorResponse} from "../types/ApiResponse.ts";
+import {ApiResponse, ErrorResponse} from "../types/ApiResponse.ts";
 import {jwtDecode} from "jwt-decode";
 import Cookies from 'js-cookie'
 
@@ -112,8 +112,14 @@ function ClientProvider({children}: ClientProviderProps) {
     }
 
     try {
-      const response = await axios.post<Tokens>(`${base_url}/api/auth/refresh`, {refreshToken: refreshToken})
-      setTokens(response.data.accessToken, response.data.refreshToken)
+      const response = await axios.post<ApiResponse<Tokens>>(`${base_url}/api/auth/refresh`, {refreshToken: refreshToken})
+      const data = response.data.data
+      if (!data) {
+        console.log('Something went wrong refreshing tokens ', response)
+        logout().then()
+        return null
+      }
+      setTokens(data.accessToken, data.refreshToken)
     } catch (e) {
       if (axios.isAxiosError<ErrorResponse>(e) && e.response) {
         await logout()

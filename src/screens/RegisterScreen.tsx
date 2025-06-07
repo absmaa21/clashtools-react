@@ -58,50 +58,46 @@ const RegisterScreen = ({onSuccess}: Props) => {
       </Typography>
       <form onSubmit={handleRegister} style={{ width: '100%' }}>
         <TextField
-          fullWidth
+          fullWidth required autoFocus
           label="Username"
           variant="outlined"
           margin="normal"
           name="username"
-          required
           error={!!errors.username}
           helperText={errors.username}
         />
         <TextField
-          fullWidth
+          fullWidth required
           label="Email"
           variant="outlined"
           margin="normal"
           name="email"
-          required
           error={!!errors.email}
           helperText={errors.email}
         />
         <TextField
-          fullWidth
+          fullWidth required
           label="Password"
           variant="outlined"
           margin="normal"
           type="password"
           name="password"
-          required
           error={!!errors.password}
           helperText={errors.password}
         />
         <TextField
-          fullWidth
+          fullWidth required
           label="Confirm Password"
           variant="outlined"
           margin="normal"
           type="password"
           name="conPassword"
-          required
           error={!!errors.conPassword}
           helperText={errors.conPassword}
         />
         <Button
-          type="submit"
           fullWidth
+          type="submit"
           variant="contained"
           color="primary"
           sx={{ mt: 2 }}

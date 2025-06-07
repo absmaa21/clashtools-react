@@ -41,28 +41,26 @@ const LoginScreen = ({onSuccess}: Props) => {
       </Typography>
       <form onSubmit={handleLogin} style={{width: '100%'}}>
         <TextField
-          fullWidth
+          fullWidth required autoFocus
           label="Username"
           variant="filled"
           margin="normal"
           name="username"
-          required
           error={!!error}
         />
         <TextField
-          fullWidth
+          fullWidth required
           label="Password"
           variant="filled"
           margin="normal"
           type="password"
           name="password"
-          required
           error={!!error}
           helperText={error ?? ' '}
         />
         <Button
-          type="submit"
           fullWidth
+          type="submit"
           variant="contained"
           color="primary"
           sx={{mt: 2}}

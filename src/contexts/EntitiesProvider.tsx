@@ -1,11 +1,11 @@
-import {ReactNode, useEffect, useState} from "react";
+import {ReactNode, useCallback, useEffect, useState} from "react";
 import {EntitiesContext} from "./contexts.ts";
 import {demoEntities} from "../services/demoData.ts";
 import {useNotifications} from "@toolpad/core";
 import {base_url, skipNetwork} from "../env.ts";
 import axios, {isAxiosError} from "axios";
-import useClient from "../hooks/useClient.ts";
 import {BaseEntityLevelRequest} from "../types/DTOs/BaseEntityLevelRequest";
+import {ApiResponse} from "../types/ApiResponse.ts";
 
 interface EntitiesProviderProps {
   children: ReactNode,
@@ -13,40 +13,46 @@ interface EntitiesProviderProps {
 
 function EntitiesProvider({children}: EntitiesProviderProps) {
 
-  const Client = useClient()
   const notify = useNotifications()
   const [entities, setEntities] = useState<Entity[]>([])
-  const [refreshEntities, setRefreshEntities] = useState<boolean>(true)
+  const [loading, setLoading] = useState(false);
+
+  const fetchEntities = useCallback(async () => {
+    if (loading) return
+    if (skipNetwork) {
+      setEntities(p => (p.length > 0 ? p : demoEntities));
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.get<ApiResponse<BaseEntityResponse[]>>(`${base_url}/api/base-entities/with-levels`)
+      const { success, data, message } = response.data
+
+      if (success && data) {
+        console.log(data)
+        const newEntities: Entity[] = data.map(e => ({
+          id: e.id,
+          name: e.name,
+          category: e.categoryId,
+          levels: e.baseEntityLevels ?? [],
+        }))
+        setEntities(newEntities);
+      } else {
+        console.error('GetAllEntities: Failed', message);
+      }
+    } catch (e) {
+      if (isAxiosError(e)) console.error(e.response);
+      notify.show(`Something went wrong getting entities.`, { autoHideDuration: 2000, severity: 'error' });
+    } finally {
+      setLoading(false)
+    }
+  }, []);
 
   useEffect(() => {
-    async function getEntities() {
-      if (!refreshEntities) return
-      if (skipNetwork) {
-        setEntities(p => p.length > 0 ? p : demoEntities)
-        return
-      }
-
-      try {
-        const response = await axios.get<BaseEntityResponse[]>(`${base_url}/api/base-entities`)
-        if (response.status === 200) {
-          console.log(response.data)
-          const newEntities: Entity[] = []
-          response.data.forEach(e => newEntities.push({
-            id: e.id,
-            name: e.name,
-            category: e.categoryId,
-            levels: e.baseEntityLevels ?? [],
-          }))
-          setEntities(newEntities)
-        }
-        else console.log('GetAllEntities: Something went wrong. ', response)
-      } catch (e) {
-        if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response) : 'Get Entities: AxiosError')
-        notify.show(`Something went wrong getting entities.`, {autoHideDuration: 2000, severity: 'error'})
-      }
-    }
-    getEntities().then(() => setRefreshEntities(false))
-  }, [refreshEntities, notify, Client.user]);
+    fetchEntities().then()
+  }, [fetchEntities])
 
 
   async function addEntity(newEntity: Entity) {
@@ -57,11 +63,13 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
 
     try {
-      const response = await axios.post<Entity>(`${base_url}/api/base-entities`, newEntity)
-      if (response.status === 200) {
-        setEntities(p => [...p, response.data])
-        setRefreshEntities(true)
+      const response = await axios.post<ApiResponse<Entity>>(`${base_url}/api/base-entities`, newEntity)
+
+      if (isSuccessResponse(response.status)) {
+        fetchEntities().then()
         notify.show(`Successfully added ${newEntity.name}`, {autoHideDuration: 1000, severity: 'success'})
+      } else {
+        console.log(response)
       }
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Add Entity: AxiosError')
@@ -82,10 +90,10 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
 
     try {
-      const response = await axios.put<Entity>(`${base_url}/api/base-entities/${oldEntity.id}`, newEntity)
-      if (response.status !== 200) return
-      setEntities(p => [...p.filter(e => e.id !== newEntity.id), response.data])
-      setRefreshEntities(true)
+      const response = await axios.put<ApiResponse<Entity>>(`${base_url}/api/base-entities/${oldEntity.id}`, newEntity)
+      if (isSuccessResponse(response.status)) return
+
+      fetchEntities().then()
       notify.show(`Successfully updated ${oldEntity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Update Entity: AxiosError')
@@ -108,11 +116,11 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
 
     try {
       const response = await axios.delete(`${base_url}/api/base-entities/${entity.id}`)
-      if (response.status !== 204) {
+      if (!isSuccessResponse(response.status)) {
         notify.show(`Error while deleting Entity: ${JSON.stringify(response.data)}`)
         return
       }
-      setRefreshEntities(true)
+      fetchEntities().then()
       notify.show(`Successfully deleted ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Remove Entity: AxiosError')
@@ -144,15 +152,10 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
         upgradeTime: newLevel.upgradeTime,
         imgPath: newLevel.imgPath,
       }
-      const response = await axios.post<EntityLevel[]>(`${base_url}/api/base-entity-levels`, body)
-      if (response.status % 200 < 100) {
+      const response = await axios.post<ApiResponse<EntityLevel[]>>(`${base_url}/api/base-entity-levels`, body)
+      if (isSuccessResponse(response.status)) {
         notify.show(`Successfully added Level ${newLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
-        /*
-        entity.levels.push(newLevel)
-        const newEntities: Entity[] = [...entities.filter(e => e.id !== entity.id), entity]
-        setEntities(newEntities)
-         */
-        setRefreshEntities(true)
+        fetchEntities().then()
       }
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Add EntityLevel: AxiosError')
@@ -192,6 +195,10 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Remove EntityLevel: AxiosError')
       notify.show(`Error while removing Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
     }
+  }
+
+  function isSuccessResponse(status: number) {
+    return status >= 200 && status < 300
   }
 
   return (

@@ -10,3 +10,11 @@ export interface ErrorResponse {
     "password"?: string,
   },
 }
+
+
+/**
+ * How every response of the Api looks like (except auth!)
+ */
+export type ApiResponse<T> =
+  | { success: true; data: T; message: string }
+  | { success: false; data: undefined; message: string };

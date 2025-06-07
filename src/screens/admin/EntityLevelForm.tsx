@@ -6,12 +6,11 @@ import {
   TextField,
   MenuItem,
   Typography,
-  Divider,
   IconButton,
   Paper,
   Grid, Container, InputAdornment, Tooltip
 } from '@mui/material';
-import {Add, ContentCut, Delete, Image} from '@mui/icons-material';
+import {ContentCut, Delete, Image} from '@mui/icons-material';
 import useEntities from "../../hooks/useEntities.ts";
 import ConfirmationDialog from "../../components/ConfirmationDialog.tsx";
 import {getResourceByType} from "../../utils/CocAssets.ts";
@@ -41,29 +40,6 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
     }))
   }
 
-  const handleStatChange = (index: number, field: 'key' | 'value', value: string | number) => {
-    setEntityLevel(prev => {
-      const newStats = [...prev.stats];
-      newStats[index] = { ...newStats[index], [field]: value };
-      return { ...prev, stats: newStats };
-    });
-  };
-
-  const addStat = () => {
-    setEntityLevel(prev => ({
-      ...prev,
-      stats: [...prev.stats, { key: '', value: '' }],
-    }));
-  };
-
-  const removeStat = (index: number) => {
-    setEntityLevel(prev => {
-      const newStats = [...prev.stats];
-      newStats.splice(index, 1);
-      return { ...prev, stats: newStats };
-    });
-  };
-
   return (
     <Container maxWidth={'md'}>
       <Paper elevation={3} sx={{ p: 3 }}>
@@ -84,7 +60,7 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
         <Grid container spacing={3}>
           <Grid size={{xs: 12, sm: 6}}>
             <TextField
-              fullWidth
+              fullWidth autoFocus
               label="Level"
               type="number"
               value={entityLevel.level}
@@ -177,41 +153,7 @@ function EntityLevelForm({entity, initEntityLevel, closeModal}: Props) {
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: 3 }} />
-
-        <Typography variant="h6" gutterBottom>
-          Stats
-        </Typography>
-
-        {entityLevel.stats.map((stat, index) => (
-          <Box key={index} sx={{ display: 'flex', gap: 2, mb: 2, alignItems: 'center' }}>
-            <TextField
-              label="Key"
-              value={stat.key}
-              onChange={(e) => handleStatChange(index, 'key', e.target.value)}
-              sx={{ flex: 1 }}
-            />
-            <TextField
-              label="Value"
-              value={stat.value as string}
-              onChange={(e) => handleStatChange(index, 'value', e.target.value)}
-              sx={{ flex: 1 }}
-            />
-            <IconButton onClick={() => removeStat(index)} color="error">
-              <Delete />
-            </IconButton>
-          </Box>
-        ))}
-
         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
-          <Button
-            variant="outlined"
-            startIcon={<Add />}
-            onClick={addStat}
-          >
-            Add Stat
-          </Button>
-
           <div>
             <Button variant="contained" color="primary" sx={{ mr: 2 }} onClick={() => {
               if (isNew) Entities.addLevel(entity, entityLevel).then(closeModal)

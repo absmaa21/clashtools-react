@@ -44,7 +44,7 @@ function EntityForm({ initEntity, closeModal }: Props) {
         <Grid container spacing={3}>
           <Grid size={{xs: 12, sm: 6}}>
             <TextField
-              fullWidth
+              fullWidth autoFocus
               label="Name"
               type="text"
               value={entity.name}
