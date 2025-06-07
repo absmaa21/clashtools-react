@@ -101,9 +101,11 @@ function ClientProvider({children}: ClientProviderProps) {
 
   async function register(username: string, email: string, password: string): Promise<ErrorResponse | string | null> {
     try {
-      const response = await axios.post<string>(`${base_url}/api/auth/register`, {username, email, password})
-      notify.show(response.data, {autoHideDuration: 1000, severity: 'success'})
-      return null
+      const response = await axios.post<ApiResponse<null>>(`${base_url}/api/auth/register`, {username, email, password})
+      if (response.data.success) {
+        notify.show('Successfully registered', {autoHideDuration: 1000, severity: 'success'})
+        return null
+      }
     } catch (e) {
       if (axios.isAxiosError<ErrorResponse>(e) && e.response) return e.response.data
     }

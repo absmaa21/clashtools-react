@@ -3,7 +3,7 @@ import {
   Box,
   Button,
   Dialog, DialogActions,
-  DialogContent,
+  DialogContent, Divider,
   IconButton,
   Menu,
   MenuItem,
@@ -70,7 +70,7 @@ function UserAvatar() {
   const textColor = Theme.palette.mode === 'light' ? Theme.palette.primary.contrastText : Theme.palette.primary.light
 
   // Show this if the user is not logged in
-  if (!Client.isLoggedIn()) {
+  if (!Client.isLoggedIn() || !Client.user) {
     return (
       <Box sx={{flexGrow: 0}}>
         <Dialog
@@ -112,7 +112,7 @@ function UserAvatar() {
     <Box sx={{flexGrow: 0}}>
       <Tooltip title="Accounts">
         <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
-          <Avatar alt={Client.user?.username}/>
+          <Avatar alt={Client.user.username}/>
         </IconButton>
       </Tooltip>
       <Menu
@@ -131,16 +131,24 @@ function UserAvatar() {
         open={Boolean(anchorElUser)}
         onClose={handleCloseUserMenu}
       >
-        {Client.accounts.map(a => (
-          <MenuItem key={a.id}>
-            <Typography sx={{textAlign: 'center'}}>
+        <Box textAlign={'center'}>
+          <Typography variant={'caption'}>
+            {Client.user.username}
+          </Typography>
+        </Box>
+
+        <Divider sx={{my: 1}}/>
+
+        {Client.accounts.map((a, i) => (
+          <MenuItem key={a.id} sx={{bgcolor: i % 2 == 1 ? '#0002' : '#0000'}}>
+            <Typography variant={'body1'} sx={{textAlign: 'center'}}>
               {a.accountName}
             </Typography>
           </MenuItem>
         ))}
 
-        <MenuItem onClick={() => setAccountFormOpen(true)}>
-          <Typography sx={{textAlign: 'center'}}>
+        <MenuItem onClick={() => setAccountFormOpen(true)} sx={{mt: 1}}>
+          <Typography variant={'body2'} sx={{textAlign: 'center', color: Theme.palette.text.secondary}}>
             New Account
           </Typography>
         </MenuItem>
