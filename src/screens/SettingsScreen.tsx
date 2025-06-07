@@ -21,7 +21,7 @@ function SettingsScreen() {
 
           <ToggleSetting
             label="Reduced Motion" desc="Reduce animations and motion effects for better accessibility."
-            checked={Settings.reducedMotion} toggle={Settings.setReducedMotion}
+            checked={Settings.reducedMotion} toggle={Settings.setReducedMotion} autoFocus
           />
 
           <Typography variant="h6" gutterBottom mt={4}>
@@ -43,15 +43,16 @@ interface ToggleSettingProps {
   desc: string,
   checked: boolean,
   toggle: (newValue: boolean) => void,
+  autoFocus?: boolean,
 }
 
-function ToggleSetting({label, desc, checked, toggle}: ToggleSettingProps) {
+function ToggleSetting({label, desc, checked, toggle, autoFocus}: ToggleSettingProps) {
   return (
     <>
       <FormControlLabel
         control={
           <Switch
-            checked={checked}
+            checked={checked} autoFocus={autoFocus}
             onChange={e => toggle(e.target.checked)}
             color="primary"
           />

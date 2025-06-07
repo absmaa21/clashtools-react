@@ -31,7 +31,6 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       const { success, data, message } = response.data
 
       if (success && data) {
-        console.log(data)
         const newEntities: Entity[] = data.map(e => ({
           id: e.id,
           name: e.name,

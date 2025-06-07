@@ -1,4 +1,4 @@
-import {ReactNode, useEffect, useState} from "react";
+import {ReactNode, useCallback, useEffect, useState} from "react";
 import { ClientContext } from "./contexts";
 import {base_url, skipNetwork} from "../env.ts";
 import axios from "axios";
@@ -15,11 +15,28 @@ function ClientProvider({children}: ClientProviderProps) {
 
   const notify = useNotifications()
   const [user, setUser] = useState<User | null>(null)
+  const [accounts, setAccounts] = useState<Account[]>([])
 
   useEffect(() => {
     if (isAccessTokenValid()) refreshUser()
     else refreshToken().then(r => r === null && console.log('Tokens refreshed.'))
   }, []);
+
+
+  const getAccounts = useCallback(async (userId: number) => {
+    const response = await axios.get<Account[]>(`${base_url}/api/accounts/by-user/${userId}`)
+    if (response.status / 200 === 1) {
+      setAccounts(response.data)
+      return
+    }
+
+    console.log(response)
+  }, [])
+
+  useEffect(() => {
+    // TODO: userId is missing danke thomas
+    getAccounts(1).then()
+  }, [getAccounts, user]);
 
 
   function isLoggedIn() {
@@ -68,8 +85,10 @@ function ClientProvider({children}: ClientProviderProps) {
     }
 
     try {
-      const response = await axios.post<Tokens>(`${base_url}/api/auth/login`, {username, password}, {withCredentials: true})
-      setTokens(response.data.accessToken, response.data.refreshToken)
+      const response = await axios.post<ApiResponse<Tokens>>(`${base_url}/api/auth/login`, {username, password}, {withCredentials: true})
+      const data = response.data
+      if (!data.data) return 'No tokens! ' + response
+      setTokens(data.data.accessToken, data.data.refreshToken)
       notify.show('Login successful.', {autoHideDuration: 1000, severity: 'success'})
       return null
     } catch (e) {
@@ -154,8 +173,39 @@ function ClientProvider({children}: ClientProviderProps) {
   }
 
 
+  async function createAccount(newAccount: AccountRequest): Promise<string | null> {
+    if (skipNetwork) {
+      setAccounts(p => [...p, {
+        ...newAccount,
+        id: -1,
+        username: '',
+        baseEntityIds: [],
+      }])
+      return null
+    }
+
+    try {
+      const response = await axios.post<ApiResponse<Account>>(`${base_url}/api/accounts`, newAccount)
+      const data = response.data.data
+      if (!data) {
+        console.log('Something went wrong creating account ', newAccount.accountName)
+        return 'Something went wrong creating account ' + newAccount.accountName
+      }
+      setAccounts(p => [...p, data])
+      return null
+    } catch (e) {
+      if (axios.isAxiosError(e) && e.response) {
+        await logout()
+        return `${e}`
+      }
+      console.error('refreshToken error was invalid!', e)
+      return 'Something went wrong'
+    }
+  }
+
+
   return (
-    <ClientContext.Provider value={{user, login, register, logout, isLoggedIn, isAdmin}}>
+    <ClientContext.Provider value={{user, accounts, login, register, logout, isLoggedIn, isAdmin, createAccount}}>
       {children}
     </ClientContext.Provider>
   );

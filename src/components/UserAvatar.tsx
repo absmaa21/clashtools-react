@@ -17,6 +17,8 @@ import useClient from "../hooks/useClient.ts";
 import RegisterScreen from "../screens/RegisterScreen.tsx";
 import LoginScreen from "../screens/LoginScreen.tsx";
 import SettingsScreen from "../screens/SettingsScreen.tsx";
+import {Logout, Settings} from "@mui/icons-material";
+import AccountForm from "./AccountForm.tsx";
 
 function UserAvatar() {
 
@@ -26,6 +28,7 @@ function UserAvatar() {
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
   const [showDialog, setShowDialog] = useState<'register' | 'login' | null>(null)
   const [settingsOpen, setSettingsOpen] = useState<boolean>(false)
+  const [accountFormOpen, setAccountFormOpen] = useState<boolean>(false)
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElUser(event.currentTarget);
@@ -44,7 +47,7 @@ function UserAvatar() {
   const handleLogout = () => {
     handleCloseUserMenu()
     setShowDialog(null)
-    Client.logout()
+    Client.logout().then()
   }
 
   const handleOpenLogin = () => {
@@ -107,13 +110,13 @@ function UserAvatar() {
 
   return (
     <Box sx={{flexGrow: 0}}>
-      <Tooltip title="Open settings">
+      <Tooltip title="Accounts">
         <IconButton onClick={handleOpenUserMenu} sx={{p: 0}}>
           <Avatar alt={Client.user?.username}/>
         </IconButton>
       </Tooltip>
       <Menu
-        sx={{mt: '45px'}}
+        sx={{mt: 8}}
         id="menu-appbar"
         anchorEl={anchorElUser}
         anchorOrigin={{
@@ -128,16 +131,40 @@ function UserAvatar() {
         open={Boolean(anchorElUser)}
         onClose={handleCloseUserMenu}
       >
-        <MenuItem key={'settings'} onClick={handleOpenSettings}>
-          <Typography sx={{textAlign: 'center'}}>Settings</Typography>
+        {Client.accounts.map(a => (
+          <MenuItem key={a.id}>
+            <Typography sx={{textAlign: 'center'}}>
+              {a.accountName}
+            </Typography>
+          </MenuItem>
+        ))}
+
+        <MenuItem onClick={() => setAccountFormOpen(true)}>
+          <Typography sx={{textAlign: 'center'}}>
+            New Account
+          </Typography>
         </MenuItem>
-        <MenuItem key={'logout'} onClick={handleLogout}>
-          <Typography sx={{textAlign: 'center'}}>Logout</Typography>
-        </MenuItem>
+
+        <Box px={1} display="flex" justifyContent="space-between" mt={1}>
+          <Tooltip title={'Settings'}>
+            <IconButton key={'settings'} onClick={handleOpenSettings}>
+              <Settings/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={'Logout'}>
+            <IconButton key={'logout'} onClick={handleLogout}>
+              <Logout/>
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Menu>
 
       <Modal open={settingsOpen} onClose={() => setSettingsOpen(false)} sx={{ placeSelf: 'center', width: '100%' }}>
         <SettingsScreen/>
+      </Modal>
+
+      <Modal open={accountFormOpen} onClose={() => setAccountFormOpen(false)} sx={{ placeSelf: 'center', width: '100%' }}>
+        <AccountForm closeModal={() => setAccountFormOpen(false)}/>
       </Modal>
     </Box>
   );

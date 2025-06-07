@@ -16,11 +16,13 @@ export const EntitiesContext = createContext<EntitiesContextProps | undefined>(u
 
 export interface ClientContextProps {
   user: User | null,
+  accounts: Account[],
   login: (username: string, password: string) => Promise<ErrorResponse | string | null>,
   register: (username: string, email: string, password: string) => Promise<ErrorResponse | string | null>,
   logout: () => Promise<void>,
   isLoggedIn: () => boolean,
   isAdmin: () => boolean,
+  createAccount: (newAccount: AccountRequest) => Promise<string | null>,
 }
 export const ClientContext = createContext<ClientContextProps | undefined>(undefined)
 
