@@ -6,6 +6,7 @@ import {base_url, skipNetwork} from "../env.ts";
 import axios, {isAxiosError} from "axios";
 import {BaseEntityLevelRequest} from "../types/DTOs/BaseEntityLevelRequest";
 import {ApiResponse} from "../types/ApiResponse.ts";
+import {BaseEntityResponse} from "../types/DTOs/BaseEntityResponse";
 
 interface EntitiesProviderProps {
   children: ReactNode,
@@ -31,12 +32,22 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       const { success, data, message } = response.data
 
       if (success && data) {
-        const newEntities: Entity[] = data.map(e => ({
-          id: e.id,
-          name: e.name,
-          category: e.categoryId,
-          levels: e.baseEntityLevels ?? [],
-        }))
+        const newEntities: Entity[] = data.map(e => {
+          const levels: EntityLevel[] = []
+          for (const level of e.baseEntityLevels) {
+            levels.push({
+              ...level,
+              cost: level.upgradeCost,
+              resource: level.resourceType,
+            })
+          }
+          return {
+            id: e.id,
+            name: e.name,
+            category: e.categoryId,
+            levels: levels,
+          }
+        })
         setEntities(newEntities);
       } else {
         console.error('GetAllEntities: Failed', message);

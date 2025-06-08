@@ -20,6 +20,14 @@ function AdminDashboard() {
 
   const {entities} = useEntities()
 
+  function sortByLevel(a: EntityLevel, b: EntityLevel) {
+    return b.level - a.level
+  }
+
+  function entitySort(a: Entity, b: Entity) {
+    return a.name.localeCompare(b.name)
+  }
+
   return (
     <Box sx={{width: '100%'}}>
       <Tabs
@@ -31,23 +39,12 @@ function AdminDashboard() {
       </Tabs>
 
       <List>
-        {entities.filter(e => e.category === activeTab).map(e =>
+        {entities.sort(entitySort).filter(e => e.category === activeTab).map(e =>
           <ListItem key={e.id} sx={{borderBottom: 1, borderColor: 'divider'}}>
             <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
               <ListItemButton onClick={() => setEditEntity(e)}>
                 {e.name}
               </ListItemButton>
-              {e.levels.map(l => (
-                <ListItemButton key={l.id} onClick={() => setEditEntityLevel({
-                  entity: e,
-                  entityLevel: l,
-                })}>
-                  <Box sx={{textAlign: 'center'}}>
-                    <img src={l.imgPath} alt={e.name} height={48}/>
-                    <Typography>Level {l.level}</Typography>
-                  </Box>
-                </ListItemButton>
-              ))}
 
               <ListItemButton
                 key={e.name + '-addnew'}
@@ -64,6 +61,18 @@ function AdminDashboard() {
                 })}>
                 Add
               </ListItemButton>
+
+              {e.levels.sort(sortByLevel).map(l => (
+                <ListItemButton key={l.id} onClick={() => setEditEntityLevel({
+                  entity: e,
+                  entityLevel: l,
+                })}>
+                  <Box sx={{textAlign: 'center'}}>
+                    <img src={l.imgPath} alt={e.name} height={48}/>
+                    <Typography>Level {l.level}</Typography>
+                  </Box>
+                </ListItemButton>
+              ))}
             </Box>
 
             <Modal
