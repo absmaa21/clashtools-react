@@ -1,7 +1,7 @@
 import {Box, LinearProgress, TableCell, Typography} from "@mui/material";
 import {secondsToString} from "../../utils/StringMethods.ts";
 import {getResourceByType} from "../../utils/CocAssets.ts";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import useAccountEntity from "../../hooks/useAccountEntity.ts";
 
 interface Props {
@@ -16,7 +16,7 @@ function UpgradeCol({accountEntity}: Props) {
     .filter(ae => ae.level > accountEntity.level)
     .sort((a, b) => a.level - b.level)[0]
 
-  function getProgressInPercent(): number {
+  const getProgressInPercent = useCallback((): number => {
     if (!accountEntity.upgradeStart || !displayLevel) return 0
 
     const now = Date.now()
@@ -24,7 +24,7 @@ function UpgradeCol({accountEntity}: Props) {
     const totalDuration = endTime - accountEntity.upgradeStart
     const elapsed = now - accountEntity.upgradeStart
     return Math.max(0, Math.min(100, elapsed / totalDuration))
-  }
+  }, [accountEntity.upgradeStart, displayLevel])
 
   useEffect(() => {
     const secInterval = setInterval(async () => {
@@ -32,7 +32,7 @@ function UpgradeCol({accountEntity}: Props) {
       if (checkForFinish(accountEntity.id)) editUpgrade(accountEntity).then()
     }, 1000)
     return () => clearInterval(secInterval)
-  }, [accountEntity.upgradeStart]);
+  }, [accountEntity, accountEntity.upgradeStart, checkForFinish, editUpgrade, getProgressInPercent]);
 
   if (!displayLevel) return (
     <TableCell sx={{ width: {sm: '33%', md: 200}, p: 0, position: 'relative' }}>

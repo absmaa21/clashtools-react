@@ -7,7 +7,7 @@ import {
   TableHead,
   TableRow,
   Paper,
-  Typography, Box, Tab, Tabs,
+  Typography, Box, Tab, Tabs, Modal, Button,
 } from '@mui/material';
 import {Category} from "../enums/Category.ts";
 import LevelCol from "../components/upgrade-tracker/LevelCol.tsx";
@@ -16,6 +16,8 @@ import {useState} from "react";
 import useAccountEntity from "../hooks/useAccountEntity.ts";
 import useEntities from "../hooks/useEntities.ts";
 import {snakeToHumanReadable} from "../utils/StringMethods.ts";
+import AccountEntityForm from "../components/AccountEntityForm.tsx";
+import {useParams} from "react-router";
 
 const UpgradeTracker = () => {
 
@@ -23,8 +25,16 @@ const UpgradeTracker = () => {
   const {accountEntities} = useAccountEntity()
   const tabCategories = Object.values(Category).filter(c => typeof c === 'string')
   const [activeTab, setActiveTab] = useState<Category>(0)
+  const [accountEntityForm, setAccountEntityForm] = useState<boolean>(false)
+  const { accountId } = useParams()
 
-  const availEntities: Entity[] = entities.filter(e => accountEntities.find(ae => ae.entity.id === e.id))
+  const availEntities: Entity[] = entities.filter(e => accountEntities.find(ae => {
+    if (ae['entity'])
+      if (ae.entity['id'])
+        if (e['id'])
+          return ae.entity.id === e.id
+    return false
+  }))
 
   return (
     <Container maxWidth="xl" style={{padding: 0, paddingBottom: 32}}>
@@ -34,7 +44,6 @@ const UpgradeTracker = () => {
         variant={'scrollable'} style={{marginBottom: 32}}
       >
         {tabCategories
-          .sort((a, b) => a.localeCompare(b))
           .map(c => <Tab key={c} label={snakeToHumanReadable(c)}/>)}
       </Tabs>
 
@@ -70,7 +79,15 @@ const UpgradeTracker = () => {
             </TableBody>
           </Table>
         </TableContainer>
+
+        <Button onClick={() => setAccountEntityForm(true)} sx={{mt: 4}}>
+          Create new Entity for current Account
+        </Button>
       </Box>
+
+      <Modal open={accountEntityForm} onClose={() => setAccountEntityForm(false)}>
+        <AccountEntityForm closeModal={() => setAccountEntityForm(false)} category={activeTab} accountId={parseInt(accountId!)} />
+      </Modal>
     </Container>
   );
 };

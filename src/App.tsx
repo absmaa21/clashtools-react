@@ -23,8 +23,10 @@ function App() {
       <Route element={<Layout/>}>
         <Route>
           <Route index element={<Index/>}/>
-          <Route path={"/tracker"} element={<AccountChooser/>}/>
-          <Route path={"/tracker/:accountId"} element={<UpgradeTracker/>}/>
+          <Route path={"/tracker"} >
+            <Route index element={<AccountChooser/>} />
+            <Route path={":accountId"} element={<UpgradeTracker/>}/>
+          </Route>
         </Route>
 
         <Route path={'/admin'}>

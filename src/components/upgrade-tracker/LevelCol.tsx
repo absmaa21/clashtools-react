@@ -16,8 +16,11 @@ function LevelCol({accountEntity}: Props) {
   const {startUpgrade, editUpgrade} = useAccountEntity()
   const [editDialog, setEditDialog] = useState<boolean>(false)
   const [finishDialog, setFinishDialog] = useState<boolean>(false)
-  const displayLevel: EntityLevel = accountEntity.entity.levels[accountEntity.level]
-    ?? accountEntity.entity.levels[accountEntity.entity.levels.length-1]
+  const displayLevel: EntityLevel = accountEntity.entity.levels
+    .filter(ae => ae.level >= accountEntity.level)
+    .sort((a, b) => a.level - b.level)[1] ?? accountEntity.entity.levels
+    .filter(ae => ae.level >= accountEntity.level)
+    .sort((a, b) => a.level - b.level)[0]
 
   const handleStartUpgradePress = () => {
     if (accountEntity.upgradeStart) setEditDialog(true)

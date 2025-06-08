@@ -20,7 +20,7 @@ function AccountChooser() {
             </Typography>
             {Client.accounts.map((a, i) => (
               <Button key={a.id} sx={{bgcolor: i % 2 == 1 ? '#0002' : '#0000', py: 2}} onClick={() => {
-                navigate(`/upgrade-tracker/${a.id}`)
+                navigate(`/tracker/${a.id}`)
               }}>
                 <Typography variant={'body1'} sx={{textAlign: 'center'}}>
                   {a.accountName}

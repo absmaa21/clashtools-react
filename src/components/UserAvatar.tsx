@@ -143,7 +143,7 @@ function UserAvatar() {
 
         {Client.accounts.map((a, i) => (
           <MenuItem key={a.id} sx={{bgcolor: i % 2 == 1 ? '#0002' : '#0000'}} onClick={() => {
-            navigate(`/upgrade-tracker/${a.id}`)
+            navigate(`/tracker/${a.id}`)
           }}>
             <Typography variant={'body1'} sx={{textAlign: 'center'}}>
               {a.accountName}
