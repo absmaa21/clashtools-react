@@ -42,12 +42,12 @@ function AdminDashboard() {
         {entities.sort(entitySort).filter(e => e.category === activeTab).map(e =>
           <ListItem key={e.id} sx={{borderBottom: 1, borderColor: 'divider'}}>
             <Box sx={{display: 'flex', alignItems: 'center', gap: 2}}>
-              <ListItemButton onClick={() => setEditEntity(e)}>
+              <ListItemButton onClick={() => setEditEntity(e)} sx={{height: 95}}>
                 {e.name}
               </ListItemButton>
 
               <ListItemButton
-                key={e.name + '-addnew'}
+                key={e.name + '-addnew'} sx={{height: 95}}
                 onClick={() => setEditEntityLevel({
                   entity: e,
                   entityLevel: {
