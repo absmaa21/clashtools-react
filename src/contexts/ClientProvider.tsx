@@ -1,7 +1,7 @@
 import {ReactNode, useCallback, useEffect, useState} from "react";
 import { ClientContext } from "./contexts";
 import {base_url, skipNetwork} from "../env.ts";
-import axios from "axios";
+import axios, {isAxiosError} from "axios";
 import {useNotifications} from "@toolpad/core";
 import {ApiResponse, ErrorResponse} from "../types/ApiResponse.ts";
 import {jwtDecode} from "jwt-decode";
@@ -18,7 +18,7 @@ function ClientProvider({children}: ClientProviderProps) {
   const [accounts, setAccounts] = useState<Account[]>([])
 
   useEffect(() => {
-    if (isAccessTokenValid()) refreshUser()
+    if (isAccessTokenValid()) refreshUser().then()
     else refreshToken().then(r => r === null && console.log('Tokens refreshed.'))
   }, []);
 
@@ -34,8 +34,7 @@ function ClientProvider({children}: ClientProviderProps) {
   }, [])
 
   useEffect(() => {
-    // TODO: userId is missing danke thomas
-    getAccounts(1).then()
+    if (user) getAccounts(user.id).then()
   }, [getAccounts, user]);
 
 
@@ -44,13 +43,24 @@ function ClientProvider({children}: ClientProviderProps) {
   }
 
 
-  function refreshUser(accessToken?: AccessToken) {
+  async function refreshUser(accessToken?: AccessToken) {
     if (skipNetwork) {
       setUser({
         username: user?.username ?? 'DemoUser',
         roles: ['ROLE_ADMIN'],
+        id: 1,
       })
       return
+    }
+
+    let userId: number = -1
+    try {
+      const response = await axios.get<ApiResponse<number>>(`${base_url}/api/user-info/current-user-id`, {withCredentials: true})
+      const data = response.data.data
+      if (response.status / 200 === 1 && data) userId = data
+    } catch (e) {
+      if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Get UserInfo: AxiosError')
+      notify.show(`Something went wrong getting UserInfo.`, {autoHideDuration: 2000, severity: 'error'})
     }
 
     if (!accessToken) {
@@ -61,15 +71,15 @@ function ClientProvider({children}: ClientProviderProps) {
     setUser({
       username: accessToken.sub,
       roles: accessToken.roles,
+      id: userId,
     })
   }
 
 
   function setTokens(accessToken: string, refreshToken: string) {
     const decodedAccess = jwtDecode<AccessToken>(accessToken)
-    Cookies.set('access_token', accessToken, { expires: decodedAccess.exp, sameSite: 'strict', secure: true })
-    Cookies.set('refresh_token', refreshToken, { sameSite: 'strict', secure: true })
-    refreshUser(decodedAccess)
+    Cookies.set('refresh_token', refreshToken)
+    refreshUser(decodedAccess).then()
   }
 
 
@@ -80,6 +90,7 @@ function ClientProvider({children}: ClientProviderProps) {
       setUser({
         username: username,
         roles: ['ROLE_ADMIN'],
+        id: 1,
       })
       return null
     }
@@ -117,8 +128,8 @@ function ClientProvider({children}: ClientProviderProps) {
   async function logout() {
     Cookies.remove('access_token')
     Cookies.remove('refresh_token')
-    // Thomas: "Braucht noch bissl Entwicklung"
-    // await axios.post(`${base_url}/api/auth/logout`)
+    // Thomas: "braucht noch bissl arbeit"
+    //await axios.post(`${base_url}/api/auth/logout`, {}, {withCredentials: true})
   }
 
 
@@ -133,7 +144,7 @@ function ClientProvider({children}: ClientProviderProps) {
     }
 
     try {
-      const response = await axios.post<ApiResponse<Tokens>>(`${base_url}/api/auth/refresh`, {refreshToken: refreshToken})
+      const response = await axios.post<ApiResponse<Tokens>>(`${base_url}/api/auth/refresh`, {refreshToken: refreshToken}, {withCredentials: true})
       const data = response.data.data
       if (!data) {
         console.log('Something went wrong refreshing tokens ', response)
@@ -155,9 +166,12 @@ function ClientProvider({children}: ClientProviderProps) {
 
 
   function isAccessTokenValid(): boolean {
-    if (skipNetwork) return !!Cookies.get('access_token')
     const accessToken = Cookies.get('access_token')
-    if (!accessToken) return false
+    if (skipNetwork) return !!accessToken
+    if (!accessToken) {
+      console.log(`Access Token is undefined!`)
+      return false
+    }
 
     try {
       const decoded = jwtDecode<AccessToken>(accessToken)

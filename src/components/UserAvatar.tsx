@@ -19,11 +19,13 @@ import LoginScreen from "../screens/LoginScreen.tsx";
 import SettingsScreen from "../screens/SettingsScreen.tsx";
 import {Logout, Settings} from "@mui/icons-material";
 import AccountForm from "./AccountForm.tsx";
+import {useNavigate} from "react-router";
 
 function UserAvatar() {
 
   const Client = useClient()
   const Theme = useTheme()
+  const navigate = useNavigate()
 
   const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null)
   const [showDialog, setShowDialog] = useState<'register' | 'login' | null>(null)
@@ -140,7 +142,9 @@ function UserAvatar() {
         <Divider sx={{my: 1}}/>
 
         {Client.accounts.map((a, i) => (
-          <MenuItem key={a.id} sx={{bgcolor: i % 2 == 1 ? '#0002' : '#0000'}}>
+          <MenuItem key={a.id} sx={{bgcolor: i % 2 == 1 ? '#0002' : '#0000'}} onClick={() => {
+            navigate(`/upgrade-tracker/${a.id}`)
+          }}>
             <Typography variant={'body1'} sx={{textAlign: 'center'}}>
               {a.accountName}
             </Typography>

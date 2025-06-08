@@ -1,17 +1,19 @@
 import {AccountEntityContext} from "./contexts.ts";
 import {ReactNode, useEffect, useState} from "react";
-import {ErrorResponse} from "../types/ApiResponse.ts";
-import {skipNetwork} from "../env.ts";
-import {isAxiosError} from "axios";
+import {ApiResponse, ErrorResponse} from "../types/ApiResponse.ts";
+import {base_url, skipNetwork} from "../env.ts";
+import axios, {isAxiosError} from "axios";
 import {useNotifications} from "@toolpad/core";
 import {demoAccountEntities} from "../services/demoData.ts";
 import useClient from "../hooks/useClient.ts";
+import {useParams} from "react-router";
 
 function AccountEntityProvider({children}: {children: ReactNode}) {
 
   const Client = useClient()
   const notify = useNotifications()
   const [accountEntities, setAccountEntities] = useState<AccountEntity[]>([])
+  const { accountId } = useParams<{ accountId: string }>()
 
   useEffect(() => {
     async function getAccountUpgrades(): Promise<ErrorResponse | string | null> {
@@ -20,8 +22,13 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
         return null
       }
 
+      if (!accountId) return 'No id in params!'
+
       try {
-        console.warn('No fetch for getting all AccountEntities')
+        const response = await axios.get<ApiResponse<AccountEntity[]>>(`${base_url}/api/account-entity/${accountId}`)
+        const data = response.data.data
+        if (data) setAccountEntities(data)
+        else console.log('Error getting AccountEntities: ', response)
       } catch (e) {
         if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Get AccountUpgrades: AxiosError')
         notify.show(`Something went wrong getting AccountEntities.`, {autoHideDuration: 2000, severity: 'error'})
@@ -29,7 +36,7 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
       return null
     }
     getAccountUpgrades().then()
-  }, [accountEntities, notify, Client.user]);
+  }, [accountEntities, notify, Client.user, accountId]);
 
 
   async function startUpgrade(id: number): Promise<ErrorResponse | string | null> {
@@ -43,7 +50,10 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
     }
 
     try {
-      console.warn('No fetch for getting starting an upgrade.')
+      const response = await axios.get<ApiResponse<AccountEntity>>(`${base_url}/api/account-entity/${id}/upgrade-start`)
+      const data = response.data.data
+      if (data) setAccountEntities(p => [...p.filter(ae => ae.id !== data.id), data])
+      else console.log(`Error starting upgrade for ${id}: `, response)
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Start Upgrade: AxiosError')
       notify.show(`Something went wrong starting an upgrade.`, {autoHideDuration: 2000, severity: 'error'})
@@ -54,7 +64,7 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
 
   async function editUpgrade(updatedUpgrade: AccountEntity): Promise<ErrorResponse | string | null> {
     if (!accountEntities.find(a => a.id === updatedUpgrade.id)) return `Id '${updatedUpgrade.id}' not found!`
-    if (await checkForFinish(updatedUpgrade.id)) {
+    if (checkForFinish(updatedUpgrade.id)) {
       updatedUpgrade.level++
       updatedUpgrade.upgradeStart = undefined
     }
@@ -65,7 +75,10 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
     }
 
     try {
-      console.warn('No fetch for getting editing an upgrade.')
+      const response = await axios.put<ApiResponse<AccountEntity>>(`${base_url}/api/account-entity/${updatedUpgrade.id}`, updatedUpgrade)
+      const data = response.data.data
+      if (data) setAccountEntities(p => [...p.filter(ae => ae.id !== data.id), data])
+      else console.log(`Error starting upgrade for ${updatedUpgrade.id}: `, response)
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Edit Upgrade: AxiosError')
       notify.show(`Something went wrong editing an upgrade.`, {autoHideDuration: 2000, severity: 'error'})
@@ -85,7 +98,10 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
     }
 
     try {
-      console.warn('No fetch for getting canceling an upgrade.')
+      await editUpgrade({
+        ...foundEntity,
+        upgradeStart: undefined,
+      })
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Cancel Upgrade: AxiosError')
       notify.show(`Something went wrong canceling an upgrade.`, {autoHideDuration: 2000, severity: 'error'})

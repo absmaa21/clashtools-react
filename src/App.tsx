@@ -6,6 +6,7 @@ import UpgradeTracker from "./screens/UpgradeTracker.tsx";
 import Layout from "./components/Layout.tsx";
 import {useEffect} from "react";
 import useClient from "./hooks/useClient.ts";
+import AccountChooser from "./components/AccountChooser.tsx";
 
 function App() {
 
@@ -22,7 +23,8 @@ function App() {
       <Route element={<Layout/>}>
         <Route>
           <Route index element={<Index/>}/>
-          <Route path={"/tracker"} element={<UpgradeTracker/>}/>
+          <Route path={"/tracker"} element={<AccountChooser/>}/>
+          <Route path={"/tracker/:accountId"} element={<UpgradeTracker/>}/>
         </Route>
 
         <Route path={'/admin'}>
