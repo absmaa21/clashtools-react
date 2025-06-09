@@ -30,7 +30,7 @@ function EditUpgrade({accountEntity, onClose}: Props) {
     .filter(ae => ae.level > accountEntity.level)
     .sort((a, b) => a.level - b.level)[0]
   // Remaining Seconds
-  const [totalSeconds, setTotalSeconds] = useState<number>((accountEntity.upgradeStart! + (displayLevel.upgradeTime ?? 100) * 1000 - Date.now()) / 1000)
+  const [totalSeconds, setTotalSeconds] = useState<number>((accountEntity.upgradeStart! + displayLevel.upgradeTime * 1000 - Date.now()) / 1000)
   const [cancelDialog, setCancelDialog] = useState<boolean>(false)
 
   useEffect(() => {
@@ -71,6 +71,10 @@ function EditUpgrade({accountEntity, onClose}: Props) {
   function onSecondsChange(newSeconds: number) {
     setTotalSeconds(dhmsToSeconds(days, hours, minutes, newSeconds));
   }
+
+  useEffect(() => {
+    console.log(totalSeconds)
+  }, [totalSeconds]);
 
 
   return (
@@ -140,10 +144,10 @@ function EditUpgrade({accountEntity, onClose}: Props) {
               variant={'contained'}
               size={'small'}
               onClick={() => {
-                const now = Date.now()
+                console.log(totalSeconds)
                 editUpgrade({
                   ...accountEntity,
-                  upgradeStart: now - totalSeconds * 1000,
+                  upgradeStart: Date.now() - totalSeconds * 1000,
                 }).then(() => onClose())
               }}
               sx={{minWidth: 0, width: 28, aspectRatio: '1'}}
