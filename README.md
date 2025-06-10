@@ -8,7 +8,8 @@
 ## How to use demo data (without java server)
 - Open [env.ts](./src/env.ts) and change **skipNetwork** to **true** [](/src/env.ts)
 
-## Already created admin account
-*This only works if you have the given database inserted*
-- Username: `admin`
-- Password: `.DemoAdmin540`
+## Admin Account
+- First create an account
+- Open the `ClashTools` Database
+- Open the table `user-roles`
+- Change the column `role` of your user to the number `2`
