@@ -10,7 +10,7 @@ interface Props {
 
 function UpgradeCol({accountEntity}: Props) {
 
-  const {checkForFinish, editUpgrade} = useAccountEntity()
+  const {checkForFinish, finishUpgrade} = useAccountEntity()
   const [progressInPercent, setProgressInPercent] = useState<number>(0)
   const displayLevel: EntityLevel | undefined = accountEntity.entity.levels
     .filter(ae => ae.level > accountEntity.level)
@@ -29,10 +29,10 @@ function UpgradeCol({accountEntity}: Props) {
   useEffect(() => {
     const secInterval = setInterval(async () => {
       setProgressInPercent(getProgressInPercent())
-      if (checkForFinish(accountEntity.id)) editUpgrade(accountEntity).then()
+      if (checkForFinish(accountEntity)) finishUpgrade(accountEntity)
     }, 1000)
     return () => clearInterval(secInterval)
-  }, [accountEntity, accountEntity.upgradeStart, checkForFinish, editUpgrade, getProgressInPercent]);
+  }, [accountEntity, accountEntity.upgradeStart, checkForFinish, finishUpgrade, getProgressInPercent]);
 
   if (!displayLevel) return (
     <TableCell sx={{ width: {sm: '33%', md: 200}, p: 0, position: 'relative' }}>

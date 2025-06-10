@@ -41,7 +41,8 @@ export interface AccountEntityProps {
   startUpgrade: (id: number) => Promise<ErrorResponse | string | null>,
   editUpgrade: (updatedUpgrade: AccountEntity) => Promise<ErrorResponse | string | null>
   cancelUpgrade: (id: number) => Promise<ErrorResponse | string | null>,
-  checkForFinish: (id: number) => boolean,
+  checkForFinish: (accountEntity: AccountEntity) => boolean,
   createAccountEntity: (newAccountEntity: AccountEntityRequestDTO) => Promise<ErrorResponse | string | null>,
+  finishUpgrade: (accountEntity: AccountEntity) => void,
 }
 export const AccountEntityContext = createContext<AccountEntityProps | undefined>(undefined)

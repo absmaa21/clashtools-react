@@ -13,7 +13,7 @@ interface Props {
 
 function LevelCol({accountEntity}: Props) {
 
-  const {startUpgrade, editUpgrade} = useAccountEntity()
+  const {startUpgrade, finishUpgrade} = useAccountEntity()
   const [editDialog, setEditDialog] = useState<boolean>(false)
   const [finishDialog, setFinishDialog] = useState<boolean>(false)
   const displayLevel: EntityLevel = accountEntity.entity.levels
@@ -74,10 +74,7 @@ function LevelCol({accountEntity}: Props) {
       <ConfirmationDialog
         open={finishDialog}
         onClose={accepted => {
-          if (accepted) {
-            accountEntity.upgradeStart = Date.now() - displayLevel.upgradeTime * 1000
-            editUpgrade(accountEntity).then()
-          }
+          if (accepted) finishUpgrade(accountEntity)
           setFinishDialog(false)
         }}
         title={`Finish ${accountEntity.entity.name} upgrade`}

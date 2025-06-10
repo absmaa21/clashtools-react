@@ -66,7 +66,9 @@ function AccountEntitiesTable() {
         </TableHead>
         <TableBody>
           {sortedData.map((ae) => {
-            const nextLevel: EntityLevel = ae.entity.levels[ae.level]
+            const nextLevel: EntityLevel = ae.entity.levels
+              .filter(el => el.level > ae.level)
+              .sort((a, b) => a.level - b.level)[0]
             return (
               (
                 <TableRow key={ae.id}>

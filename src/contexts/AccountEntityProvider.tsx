@@ -86,7 +86,7 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
 
   async function editUpgrade(updatedUpgrade: AccountEntity): Promise<ErrorResponse | string | null> {
     if (!accountEntities.find(a => a.id === updatedUpgrade.id)) return `Id '${updatedUpgrade.id}' not found!`
-    if (checkForFinish(updatedUpgrade.id)) {
+    if (checkForFinish(updatedUpgrade)) {
       updatedUpgrade.level++
       updatedUpgrade.upgradeStart = undefined
     }
@@ -158,19 +158,39 @@ function AccountEntityProvider({children}: {children: ReactNode}) {
   }
 
 
-  function checkForFinish(id: number): boolean {
-    const accountEntity = accountEntities.find(ae => ae.id === id)
-    if (!accountEntity || !accountEntity.upgradeStart) return false
+  function checkForFinish(accountEntity: AccountEntity): boolean {
+    if (!accountEntity.upgradeStart) {
+      console.log('checkForFinish: upgrade not started!')
+      return false
+    }
 
     const nextLevel: EntityLevel | undefined = accountEntity.entity.levels[accountEntity.level]
-    if (!nextLevel) return false
+    if (!nextLevel) {
+      console.log('checkForFinish: No next level found')
+      return false
+    }
 
     return Date.now() >= accountEntity.upgradeStart + nextLevel.upgradeTime * 1000
   }
 
 
+  function finishUpgrade(accountEntity: AccountEntity) {
+    const nextLevel: EntityLevel | undefined = accountEntity.entity.levels[accountEntity.level]
+    if (!nextLevel) {
+      console.log('finishUpgrade: No next level found!')
+      return
+    }
+
+    editUpgrade({
+      ...accountEntity,
+      level: accountEntity.level + 1,
+      upgradeStart: undefined,
+    }).then()
+  }
+
+
   return (
-    <AccountEntityContext.Provider value={{ accountEntities, startUpgrade, editUpgrade, cancelUpgrade, checkForFinish, createAccountEntity }}>
+    <AccountEntityContext.Provider value={{ accountEntities, startUpgrade, editUpgrade, cancelUpgrade, checkForFinish, createAccountEntity, finishUpgrade }}>
       {children}
     </AccountEntityContext.Provider>
   );

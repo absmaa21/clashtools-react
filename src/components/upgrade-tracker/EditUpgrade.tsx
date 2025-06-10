@@ -144,7 +144,6 @@ function EditUpgrade({accountEntity, onClose}: Props) {
               variant={'contained'}
               size={'small'}
               onClick={() => {
-                console.log(totalSeconds)
                 editUpgrade({
                   ...accountEntity,
                   upgradeStart: Date.now() - totalSeconds * 1000,

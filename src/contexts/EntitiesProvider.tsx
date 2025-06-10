@@ -181,9 +181,21 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
       return
     }
 
+    const body: BaseEntityLevelRequest = {
+      baseEntityId: entity.id,
+      level: updatedLevel.level,
+      resourceType: updatedLevel.resource,
+      upgradeCost: updatedLevel.cost,
+      upgradeTime: updatedLevel.upgradeTime,
+      imgPath: updatedLevel.imgPath,
+    }
+
     try {
-      console.warn('No put for updating a entity level')
-      //notify.show(`Successfully edited Level ${updatedLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      const response = await axios.put<ApiResponse<EntityLevel>>(`${base_url}/api/base-entity-levels/${updatedLevel.id}`, body)
+      if (isSuccessResponse(response.status)) {
+        notify.show(`Successfully edited Level ${updatedLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+        fetchEntities().then()
+      }
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Edit EntityLevel: AxiosError')
       notify.show(`Error while editing Level ${updatedLevel.level} for ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
@@ -199,8 +211,11 @@ function EntitiesProvider({children}: EntitiesProviderProps) {
     }
 
     try {
-      console.warn('No delete for removing entity level')
-      //notify.show(`Successfully deleted Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+      const response = await axios.delete<ApiResponse<EntityLevel>>(`${base_url}/api/base-entity-levels/${entityLevel.id}`)
+      if (isSuccessResponse(response.status)) {
+        notify.show(`Successfully deleted Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 1000, severity: 'success'})
+        fetchEntities().then()
+      }
     } catch (e) {
       if (isAxiosError(e)) console.log(e.response ? JSON.stringify(e.response.data) : 'Remove EntityLevel: AxiosError')
       notify.show(`Error while removing Level ${entityLevel.level} for ${entity.name}.`, {autoHideDuration: 2000, severity: 'error'})
