@@ -101,6 +101,7 @@ function ClientProvider({children}: ClientProviderProps) {
       if (!data.data) return 'No tokens! ' + response
       setTokens(data.data.accessToken, data.data.refreshToken)
       notify.show('Login successful.', {autoHideDuration: 1000, severity: 'success'})
+      window.location.reload()
       return null
     } catch (e) {
       if (axios.isAxiosError<ErrorResponse>(e) && e.response) return e.response.data
