@@ -9,6 +9,7 @@
 - Open [env.ts](./src/env.ts) and change **skipNetwork** to **true** [](/src/env.ts)
 
 ## Admin Account
+*Using demo data will always act as admin*
 - First create an account
 - Open the `ClashTools` Database
 - Open the table `user-roles`
